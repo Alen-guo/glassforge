@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next';
 
 export default function robots(): MetadataRoute.Robots {
-    const baseUrl = 'https://glassforge.dev';
+    const baseUrl = 'https://www.liquidglass.space';
 
     return {
         rules: {

@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-    const baseUrl = 'https://glassforge.dev';
+    const baseUrl = 'https://www.liquidglass.space';
 
     return [
         {
