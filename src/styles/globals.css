@@ -1,0 +1,604 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 全局CSS变量 - 液态玻璃效果 */
+:root {
+    /* 玻璃效果基础变量 */
+    --glass-transparency: 0.1;
+    --glass-blur: 10px;
+    --glass-border: rgba(255, 255, 255, 0.2);
+    --glass-shadow: rgba(31, 38, 135, 0.37);
+
+    /* 苹果设计系统颜色 */
+    --apple-blue: #007AFF;
+    --apple-purple: #5856D6;
+    --apple-pink: #FF2D92;
+    --apple-red: #FF3B30;
+    --apple-orange: #FF9500;
+    --apple-yellow: #FFCC00;
+    --apple-green: #34C759;
+    --apple-teal: #5AC8FA;
+
+    /* 深色模式变量 */
+    --dark-glass-transparency: 0.15;
+    --dark-glass-border: rgba(255, 255, 255, 0.1);
+
+    /* 动画缓动函数 */
+    --apple-ease: cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+/* 基础样式重置 */
+* {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+}
+
+/* 防止FOUC (Flash of Unstyled Content) 和字体闪烁 */
+html {
+    font-display: swap;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* 确保所有文本都使用统一的渲染设置 */
+*,
+*::before,
+*::after {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body,
+.apple-font {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+        'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+        sans-serif !important;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    font-weight: 400;
+    line-height: 1.5;
+    color: white;
+}
+
+/* 确保粗体文字在页面刷新后保持一致 */
+strong,
+b,
+.font-bold,
+.font-semibold,
+.font-extrabold {
+    font-weight: 600 !important;
+    color: white !important;
+    font-family: inherit !important;
+}
+
+/* 确保标题文字样式一致 */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+        'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+        sans-serif !important;
+    font-weight: 600 !important;
+    color: white !important;
+    line-height: 1.2;
+    text-rendering: optimizeLegibility !important;
+    -webkit-font-smoothing: antialiased !important;
+    -moz-osx-font-smoothing: grayscale !important;
+}
+
+/* 特别保护实时预览区域的样式 - 简洁清晰 */
+.glass-text,
+.preview-content h4.text-white.text-lg.font-bold,
+.preview-content .font-bold.text-white,
+.preview-content .font-semibold.text-white,
+.preview-content strong.text-white,
+.preview-content h4,
+.preview-content .font-bold,
+.preview-content .font-semibold,
+.preview-content strong {
+    font-weight: 700 !important;
+    color: white !important;
+
+    /* 字体渲染优化 */
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+    text-rendering: optimizeLegibility !important;
+    -webkit-font-smoothing: antialiased !important;
+    -moz-osx-font-smoothing: grayscale !important;
+
+    /* 简单的过渡效果 */
+    transition: all 0.3s ease !important;
+}
+
+
+
+/* 悬停时简单效果 */
+.glass-text:hover,
+.preview-content:hover .glass-text,
+.preview-content:hover h4.text-white.text-lg.font-bold,
+.preview-content:hover h4,
+.preview-content:hover .font-bold,
+.preview-content:hover .font-semibold,
+.preview-content:hover strong {
+    color: white !important;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5) !important;
+}
+
+
+
+/* 确保所有预览内容的文字渲染一致性 */
+.preview-content * {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+    -webkit-font-smoothing: antialiased !important;
+    -moz-osx-font-smoothing: grayscale !important;
+    text-rendering: optimizeLegibility !important;
+}
+
+/* 预览区域中其他字体的轻微玻璃效果 */
+.preview-content span.font-semibold,
+.preview-content .font-medium,
+.preview-content label {
+    color: rgba(255, 255, 255, 0.95) !important;
+    text-shadow:
+        0 1px 2px rgba(0, 0, 0, 0.2),
+        0 0 10px rgba(255, 255, 255, 0.1) !important;
+    transition: all 0.3s ease !important;
+}
+
+/* 预览区域按钮的正常样式 */
+.preview-content .text-center,
+.preview-content .bg-white\/10,
+.preview-content .bg-blue-500\/20 {
+    background: rgba(255, 255, 255, 0.08) !important;
+    backdrop-filter: blur(5px) !important;
+    -webkit-backdrop-filter: blur(5px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+
+    color: white !important;
+
+    transition: all 0.3s ease !important;
+}
+
+/* 按钮悬停效果 */
+.preview-content .text-center:hover,
+.preview-content .bg-white\/10:hover,
+.preview-content .bg-blue-500\/20:hover {
+    background: rgba(255, 255, 255, 0.15) !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* 强制所有白色文字保持一致 */
+.text-white {
+    color: rgb(255, 255, 255) !important;
+}
+
+/* 防止字体闪烁的额外保护 */
+@media screen {
+
+    body,
+    .apple-font,
+    * {
+        font-display: block !important;
+    }
+}
+
+/* 液态玻璃效果基础类 */
+.glass-base {
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    background: rgba(255, 255, 255, var(--glass-transparency));
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 8px 32px 0 var(--glass-shadow);
+}
+
+/* iOS风格玻璃效果 */
+.glass-ios {
+    @apply glass-base;
+    border-radius: 16px;
+    backdrop-filter: blur(20px);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Vision Pro风格玻璃效果 */
+.glass-vision-pro {
+    @apply glass-base;
+    border-radius: 24px;
+    backdrop-filter: blur(40px);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* macOS风格玻璃效果 */
+.glass-macos {
+    @apply glass-base;
+    border-radius: 12px;
+    backdrop-filter: blur(15px);
+    background: rgba(255, 255, 255, 0.12);
+}
+
+/* Material Design玻璃效果 */
+.glass-material {
+    @apply glass-base;
+    border-radius: 8px;
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+/* 按钮样式 */
+.glass-button {
+    @apply glass-base cursor-pointer select-none;
+    border-radius: 12px;
+    padding: 12px 24px;
+    transition: all 0.3s var(--apple-ease);
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.glass-button:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+.glass-button:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* 输入框样式 */
+.glass-input {
+    @apply glass-base;
+    border-radius: 8px;
+    padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: white;
+    transition: all 0.3s var(--apple-ease);
+}
+
+.glass-input:focus {
+    outline: none;
+    border-color: var(--apple-blue);
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.glass-input::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* 选择框样式 */
+.glass-select {
+    @apply glass-base;
+    border-radius: 8px;
+    padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: white;
+    transition: all 0.3s var(--apple-ease);
+    appearance: none;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6,9 12,15 18,9"></polyline></svg>');
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+    padding-right: 40px;
+    /* 确保文字在所有浏览器中都是白色 */
+    -webkit-text-fill-color: white;
+    -moz-text-fill-color: white;
+}
+
+.glass-select:focus {
+    outline: none;
+    border-color: var(--apple-blue);
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.glass-select option {
+    background: #1a1a2e !important;
+    color: white !important;
+    padding: 8px;
+    border: none;
+}
+
+/* 修复浏览器兼容性问题 */
+.glass-select option:checked {
+    background: #007AFF !important;
+    color: white !important;
+}
+
+.glass-select option:hover {
+    background: #2a2a4e !important;
+    color: white !important;
+}
+
+/* 强制Chrome/Edge显示正确颜色 */
+.glass-select optgroup {
+    background: #1a1a2e !important;
+    color: white !important;
+}
+
+/* 卡片样式 */
+.glass-card {
+    @apply glass-base;
+    border-radius: 16px;
+    padding: 24px;
+    backdrop-filter: blur(20px);
+    background: rgba(255, 255, 255, 0.1);
+    transition: all 0.3s var(--apple-ease);
+}
+
+.glass-card:hover {
+    background: rgba(255, 255, 255, 0.12);
+    transform: translateY(-4px);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.15);
+}
+
+/* 导航栏样式 */
+.glass-navbar {
+    @apply glass-base;
+    backdrop-filter: blur(30px);
+    background: rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* 滚动条样式 */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+/* 深色模式样式 */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --glass-transparency: var(--dark-glass-transparency);
+        --glass-border: var(--dark-glass-border);
+    }
+
+    body {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    }
+}
+
+/* 动画类 */
+.animate-float {
+    animation: float 6s ease-in-out infinite;
+}
+
+.animate-glow {
+    animation: glow 2s ease-in-out infinite alternate;
+}
+
+.animate-glass-morph {
+    animation: glass-morph 4s ease-in-out infinite;
+}
+
+.animate-liquid-flow {
+    animation: liquid-flow 8s ease-in-out infinite;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .glass-card {
+        padding: 16px;
+        border-radius: 12px;
+    }
+
+    .glass-button {
+        padding: 10px 20px;
+    }
+}
+
+/* 高对比度模式支持 */
+@media (prefers-contrast: high) {
+    .glass-base {
+        border-width: 2px;
+        background: rgba(255, 255, 255, 0.2);
+    }
+}
+
+/* 滑块样式优化 */
+.slider {
+    background: linear-gradient(to right, #3b82f6 0%, #8b5cf6 100%);
+    height: 6px;
+    border-radius: 3px;
+    outline: none;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+.slider:hover {
+    opacity: 1;
+}
+
+.slider::-webkit-slider-thumb {
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+/* 增强的玻璃效果动画 */
+@keyframes glass-shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+.glass-shimmer {
+    background: linear-gradient(90deg,
+            transparent,
+            rgba(255, 255, 255, 0.1),
+            transparent);
+    background-size: 200% 100%;
+    animation: glass-shimmer 2s infinite;
+}
+
+/* 液态玻璃悬停效果增强 */
+.liquid-glass-enhanced {
+    position: relative;
+    overflow: hidden;
+}
+
+.liquid-glass-enhanced::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg,
+            transparent,
+            rgba(255, 255, 255, 0.1),
+            transparent);
+    transition: left 0.5s;
+}
+
+.liquid-glass-enhanced:hover::before {
+    left: 100%;
+}
+
+/* 高级玻璃效果变体 */
+.glass-navbar {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.glass-input {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    color: white;
+    padding: 12px 16px;
+    transition: all 0.3s ease;
+}
+
+.glass-input:focus {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(59, 130, 246, 0.5);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.glass-input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+/* 代码高亮优化 */
+.code-block {
+    background: linear-gradient(145deg, rgba(0, 0, 0, 0.8), rgba(20, 20, 50, 0.6));
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    position: relative;
+    overflow: hidden;
+}
+
+.code-block::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+}
+
+/* 响应式玻璃效果 */
+@media (max-width: 768px) {
+    .liquid-glass {
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+    }
+
+    .glass-card {
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+    }
+}
+
+/* 无障碍支持 */
+@media (prefers-reduced-motion: reduce) {
+    .liquid-glass-enhanced::before {
+        display: none;
+    }
+
+    .glass-shimmer {
+        animation: none;
+    }
+
+    * {
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* 高对比度模式支持 */
+@media (prefers-contrast: high) {
+    .liquid-glass {
+        border-width: 2px;
+        border-color: rgba(255, 255, 255, 0.5);
+    }
+
+    .glass-card {
+        border-width: 2px;
+        border-color: rgba(255, 255, 255, 0.3);
+    }
+}
+
+/* 减少动画模式支持 */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+
+    .glass-shimmer {
+        animation: none;
+    }
+}
