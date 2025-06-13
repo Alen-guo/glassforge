@@ -3,6 +3,7 @@
 import React, { useState, useCallback } from 'react';
 import { Copy, Download, Settings, Sparkles, Code, Palette, CheckCircle, RefreshCw, Heart } from 'lucide-react';
 import { useGlassActions, useGlassParams, useCurrentPreset } from '@/hooks/use-glass-store';
+import { ExportFormat } from '@/types/glass';
 import Navbar from '@/components/layout/Navbar';
 import CodePreview from './CodePreview';
 import html2canvas from 'html2canvas';
@@ -11,9 +12,7 @@ import Ripple from './Ripple';
 
 export default function GeneratorClient() {
   const [copySuccess, setCopySuccess] = useState(false);
-  const [exportFormat, setExportFormat] = useState<
-    'css' | 'tailwind' | 'react' | 'react-ts' | 'vue' | 'svelte' | 'flutter' | 'swiftui' | 'kotlin'
-  >('css');
+  const [exportFormat, setExportFormat] = useState<ExportFormat>('css');
   const [backgroundImage, setBackgroundImage] = useState<string>('banner1.jpg');
   
   // 使用玻璃效果状态管理
@@ -107,6 +106,7 @@ export default function GeneratorClient() {
       case 'react-ts':
         return 'tsx';
       case 'vue':
+      case 'vue-ts':
         return 'vue';
       case 'svelte':
         return 'svelte';
@@ -114,6 +114,13 @@ export default function GeneratorClient() {
         return 'dart';
       case 'swiftui':
         return 'swift';
+      case 'kotlin':
+        return 'kt';
+      case 'compose':
+        return 'kt';
+      case 'emotion':
+      case 'styled-components':
+        return 'tsx';
       default:
         return 'txt';
     }

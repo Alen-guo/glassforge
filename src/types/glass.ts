@@ -77,6 +77,7 @@ export type ExportFormat =
     | 'react'
     | 'react-ts'
     | 'vue'
+    | 'vue-ts'
     | 'svelte'
     | 'flutter'
     | 'swiftui'

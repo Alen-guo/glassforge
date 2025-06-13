@@ -6,9 +6,19 @@ import type {
     GlassPresetType,
     UserPreferences,
     Scene3DConfig,
-    ExportFormat
+    ExportFormat,
+    ExportConfig
 } from '@/types/glass';
-import { DEFAULT_GLASS_PARAMS, GLASS_PRESETS, validateGlassParams, generateSimpleCSS, generateSimpleReact, generateSimpleVue, generateSimpleFlutter } from '@/lib/glass-generator';
+import {
+    DEFAULT_GLASS_PARAMS,
+    GLASS_PRESETS,
+    validateGlassParams,
+    generateSimpleCSS,
+    generateSimpleReact,
+    generateSimpleVue,
+    generateSimpleFlutter,
+    generateCode
+} from '@/lib/glass-generator';
 
 interface GlassStore extends AppState {
     // Actions for glass parameters
@@ -248,6 +258,9 @@ export const useGlassActions = () => {
         applyPreset: store.setPreset,
         updateParam: (key: string, value: any) => {
             store.updateParams({ [key]: value });
-        }
+        },
+        // 通用代码生成方法
+        generateCode: (format: ExportFormat, config: ExportConfig) =>
+            generateCode(store.currentParams, format, config)
     };
 }; 
