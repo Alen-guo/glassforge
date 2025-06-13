@@ -73,17 +73,15 @@ export interface GlassPreset {
  */
 export type ExportFormat =
     | 'css'
+    | 'tailwind'
     | 'react'
     | 'react-ts'
     | 'vue'
-    | 'vue-ts'
     | 'svelte'
     | 'flutter'
-    | 'swift'
     | 'swiftui'
     | 'kotlin'
     | 'compose'
-    | 'tailwind'
     | 'emotion'
     | 'styled-components';
 
