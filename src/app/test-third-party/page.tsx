@@ -3,9 +3,49 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import Navbar from '@/components/layout/Navbar';
+import GlassCard from '@/components/glass/GlassCard';
+
+// 错误边界组件
+class ErrorBoundary extends React.Component<
+  { children: React.ReactNode; fallback: React.ReactNode },
+  { hasError: boolean }
+> {
+  constructor(props: any) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.log('LiquidGlass Error:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return this.props.fallback;
+    }
+
+    return this.props.children;
+  }
+}
 
 // 动态导入第三方包，避免SSR问题
-const LiquidGlass = dynamic(() => import('liquid-glass-react'), {
+const LiquidGlass = dynamic(() => import('liquid-glass-react').catch(() => {
+  // 如果导入失败，返回一个降级组件
+  return {
+    default: ({ children, ...props }: any) => (
+      <GlassCard preset="ios" className="p-8">
+        {children}
+        <div className="mt-4 text-xs text-white/50">
+          Note: Using fallback glass effect (liquid-glass-react unavailable)
+        </div>
+      </GlassCard>
+    )
+  };
+}), {
   ssr: false,
   loading: () => (
     <div className="text-white animate-pulse p-4 border border-white/20 rounded bg-white/5 backdrop-blur-sm">
@@ -33,6 +73,7 @@ interface LiquidGlassParams {
 export default function TestThirdPartyPage(): JSX.Element {
   const [isClient, setIsClient] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [hasLiquidGlass, setHasLiquidGlass] = useState(true);
   const [params, setParams] = useState<LiquidGlassParams>({
     displacementScale: 30,
     blurAmount: 0.01,
@@ -49,6 +90,11 @@ export default function TestThirdPartyPage(): JSX.Element {
     const timer = setTimeout(() => {
       setIsLoaded(true);
     }, 100);
+    
+    // 检测 liquid-glass-react 是否可用
+    import('liquid-glass-react').catch(() => {
+      setHasLiquidGlass(false);
+    });
     
     return () => clearTimeout(timer);
   }, []);
@@ -70,6 +116,18 @@ export default function TestThirdPartyPage(): JSX.Element {
       mode: 'standard'
     });
   }, []);
+
+  // 降级组件
+  const FallbackGlassEffect = ({ children, ...props }: any) => (
+    <GlassCard preset="ios" className="p-8 relative">
+      {children}
+      <div className="absolute top-2 right-2">
+        <span className="px-2 py-1 text-xs bg-yellow-500/20 text-yellow-300 rounded border border-yellow-400/30">
+          Fallback Mode
+        </span>
+      </div>
+    </GlassCard>
+  );
 
   // 服务端渲染时显示加载状态
   if (!isClient) {
@@ -111,6 +169,15 @@ export default function TestThirdPartyPage(): JSX.Element {
         >
           {/* 背景遮罩 */}
           <div className="absolute inset-0 bg-black/20"></div>
+          
+          {/* 状态提示 */}
+          {!hasLiquidGlass && (
+            <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-50">
+              <div className="bg-yellow-500/20 border border-yellow-400/50 rounded-lg px-4 py-2 text-yellow-300 text-sm">
+                ⚠️ Using fallback glass effects (liquid-glass-react compatibility issue)
+              </div>
+            </div>
+          )}
           
           {/* 左侧参数控制面板 */}
           <div className="fixed left-4 top-20 bottom-4 w-72 z-30 overflow-y-auto">
@@ -376,6 +443,12 @@ export default function TestThirdPartyPage(): JSX.Element {
                   <h3 className="text-white font-medium mb-3">🚀 Performance</h3>
                 <div className="text-sm space-y-2">
                     <div className="flex justify-between">
+                      <span className="text-white/70">Library:</span>
+                      <span className={hasLiquidGlass ? "text-green-400" : "text-yellow-400"}>
+                        {hasLiquidGlass ? '✅ liquid-glass-react' : '⚠️ Fallback Mode'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
                       <span className="text-white/70">WebGL:</span>
                       <span className="text-green-400">
                         {typeof window !== 'undefined' && window.WebGLRenderingContext ? 'Supported' : 'Not Available'}
@@ -388,10 +461,6 @@ export default function TestThirdPartyPage(): JSX.Element {
                     <div className="flex justify-between">
                       <span className="text-white/70">Frame Rate:</span>
                       <span className="text-green-400">60 FPS</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-white/70">GPU Memory:</span>
-                      <span className="text-blue-400">Optimized</span>
                     </div>
                   </div>
                 </div>
@@ -406,54 +475,6 @@ export default function TestThirdPartyPage(): JSX.Element {
                     <li>Lower elasticity = smoother, fluid animations</li>
                     <li>Experiment with corner radius for shape variety</li>
                   </ul>
-                </div>
-
-                  <div>
-                  <h3 className="text-white font-medium mb-3">🎪 Quick Actions</h3>
-                  <div className="grid grid-cols-1 gap-2">
-                    <button
-                      onClick={() => setParams({
-                        displacementScale: 80,
-                        blurAmount: 0.15,
-                        saturation: 200,
-                        aberrationIntensity: 3,
-                        elasticity: 0.3,
-                        cornerRadius: 6,
-                        mode: 'shader'
-                      })}
-                      className="py-2 px-3 bg-red-600/80 hover:bg-red-600 border border-red-400/50 rounded text-white text-sm font-medium transition-all duration-200 hover:scale-105"
-                    >
-                      🌪️ Extreme
-                    </button>
-                    <button
-                      onClick={() => setParams({
-                        displacementScale: 45,
-                        blurAmount: 0.06,
-                        saturation: 120,
-                        aberrationIntensity: 1.2,
-                        elasticity: 0.12,
-                        cornerRadius: 18,
-                        mode: 'polar'
-                      })}
-                      className="py-2 px-3 bg-cyan-600/80 hover:bg-cyan-600 border border-cyan-400/50 rounded text-white text-sm font-medium transition-all duration-200 hover:scale-105"
-                    >
-                      🌊 Wave
-                    </button>
-                    <button
-                      onClick={() => setParams({
-                        displacementScale: 25,
-                        blurAmount: 0.04,
-                        saturation: 90,
-                        aberrationIntensity: 0.7,
-                        elasticity: 0.06,
-                        cornerRadius: 30,
-                        mode: 'prominent'
-                      })}
-                      className="py-2 px-3 bg-amber-600/80 hover:bg-amber-600 border border-amber-400/50 rounded text-white text-sm font-medium transition-all duration-200 hover:scale-105"
-                    >
-                      ✨ Elegant
-                    </button>
-                  </div>
                 </div>
 
               </div>
@@ -502,27 +523,43 @@ export default function TestThirdPartyPage(): JSX.Element {
             {/* 主要的 Liquid Glass 展示区域 */}
             <div className="w-full flex justify-center mb-30">
               {isLoaded ? (
-                <LiquidGlass
-                  displacementScale={params.displacementScale}
-                  blurAmount={params.blurAmount}
-                  saturation={params.saturation}
-                  aberrationIntensity={params.aberrationIntensity}
-                  elasticity={params.elasticity}
-                  cornerRadius={params.cornerRadius}
-                  mode={params.mode}
-                >
-                  <div className="text-center ">
-                    <h2 className="text-white font-bold text-3xl mb-4">
-                      Liquid Glass Effect
-                    </h2>
-                    <p className="text-white/90 text-lg mb-3">
-                      Real-time parameter adjustment
-                    </p>
-                    <div className="text-white/70 text-base">
-                      {params.mode.toUpperCase()} Mode | Scale: {params.displacementScale}
+                <ErrorBoundary fallback={
+                  <FallbackGlassEffect>
+                    <div className="text-center">
+                      <h2 className="text-white font-bold text-3xl mb-4">
+                        Liquid Glass Effect
+                      </h2>
+                      <p className="text-white/90 text-lg mb-3">
+                        Real-time parameter adjustment
+                      </p>
+                      <div className="text-white/70 text-base">
+                        {params.mode.toUpperCase()} Mode | Scale: {params.displacementScale}
+                      </div>
                     </div>
-                  </div>
-                </LiquidGlass>
+                  </FallbackGlassEffect>
+                }>
+                  <LiquidGlass
+                    displacementScale={params.displacementScale}
+                    blurAmount={params.blurAmount}
+                    saturation={params.saturation}
+                    aberrationIntensity={params.aberrationIntensity}
+                    elasticity={params.elasticity}
+                    cornerRadius={params.cornerRadius}
+                    mode={params.mode}
+                  >
+                    <div className="text-center ">
+                      <h2 className="text-white font-bold text-3xl mb-4">
+                        Liquid Glass Effect
+                      </h2>
+                      <p className="text-white/90 text-lg mb-3">
+                        Real-time parameter adjustment
+                      </p>
+                      <div className="text-white/70 text-base">
+                        {params.mode.toUpperCase()} Mode | Scale: {params.displacementScale}
+                      </div>
+                    </div>
+                  </LiquidGlass>
+                </ErrorBoundary>
               ) : (
                 <div className="text-white animate-pulse p-8 border border-white/20 rounded bg-white/5 backdrop-blur-sm min-w-[400px] min-h-[200px] flex items-center justify-center">
                   <div className="text-center">
@@ -548,25 +585,38 @@ export default function TestThirdPartyPage(): JSX.Element {
                 {/* 对比1: 低强度 */}
                 <div className="text-center">
                   {isLoaded ? (
-                    <LiquidGlass
-                      displacementScale={15}
-                      blurAmount={0.02}
-                      saturation={70}
-                      aberrationIntensity={0.5}
-                      elasticity={0.05}
-                      cornerRadius={24}
-                      padding="30px 40px"
-                      mode="prominent"
-                    >
-                      <div className="text-center">
-                        <h3 className="text-white font-semibold text-lg mb-2">
-                          Subtle Effect
-                        </h3>
-                        <p className="text-white/80 text-sm">
-                          Minimal distortion for elegant design
-                        </p>
-                      </div>
-                    </LiquidGlass>
+                    <ErrorBoundary fallback={
+                      <FallbackGlassEffect>
+                        <div className="text-center">
+                          <h3 className="text-white font-semibold text-lg mb-2">
+                            Subtle Effect
+                          </h3>
+                          <p className="text-white/80 text-sm">
+                            Minimal distortion for elegant design
+                          </p>
+                        </div>
+                      </FallbackGlassEffect>
+                    }>
+                      <LiquidGlass
+                        displacementScale={15}
+                        blurAmount={0.02}
+                        saturation={70}
+                        aberrationIntensity={0.5}
+                        elasticity={0.05}
+                        cornerRadius={24}
+                        padding="30px 40px"
+                        mode="prominent"
+                      >
+                        <div className="text-center">
+                          <h3 className="text-white font-semibold text-lg mb-2">
+                            Subtle Effect
+                          </h3>
+                          <p className="text-white/80 text-sm">
+                            Minimal distortion for elegant design
+                          </p>
+                        </div>
+                      </LiquidGlass>
+                    </ErrorBoundary>
                   ) : (
                     <div className="bg-white/5 backdrop-blur-sm border border-white/20 rounded-lg p-8 text-white">
                       <div className="animate-pulse">Loading...</div>
@@ -578,25 +628,38 @@ export default function TestThirdPartyPage(): JSX.Element {
                 {/* 对比2: 高强度 */}
                 <div className="text-center">
                   {isLoaded ? (
-                    <LiquidGlass
-                      displacementScale={70}
-                      blurAmount={0.12}
-                      saturation={180}
-                      aberrationIntensity={2.5}
-                      elasticity={0.25}
-                      cornerRadius={8}
-                      padding="30px 40px"
-                      mode="shader"
-                    >
-                      <div className="text-center">
-                        <h3 className="text-white font-semibold text-lg mb-2">
-                          Dynamic Effect
-                        </h3>
-                        <p className="text-white/80 text-sm">
-                          High-impact visual experience
-                        </p>
-                      </div>
-                    </LiquidGlass>
+                    <ErrorBoundary fallback={
+                      <FallbackGlassEffect>
+                        <div className="text-center">
+                          <h3 className="text-white font-semibold text-lg mb-2">
+                            Dynamic Effect
+                          </h3>
+                          <p className="text-white/80 text-sm">
+                            High-impact visual experience
+                          </p>
+                        </div>
+                      </FallbackGlassEffect>
+                    }>
+                      <LiquidGlass
+                        displacementScale={70}
+                        blurAmount={0.12}
+                        saturation={180}
+                        aberrationIntensity={2.5}
+                        elasticity={0.25}
+                        cornerRadius={8}
+                        padding="30px 40px"
+                        mode="shader"
+                      >
+                        <div className="text-center">
+                          <h3 className="text-white font-semibold text-lg mb-2">
+                            Dynamic Effect
+                          </h3>
+                          <p className="text-white/80 text-sm">
+                            High-impact visual experience
+                          </p>
+                        </div>
+                      </LiquidGlass>
+                    </ErrorBoundary>
                   ) : (
                     <div className="bg-white/5 backdrop-blur-sm border border-white/20 rounded-lg p-8 text-white">
                       <div className="animate-pulse">Loading...</div>
@@ -610,121 +673,52 @@ export default function TestThirdPartyPage(): JSX.Element {
               {/* 模式展示 */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 
-                {/* Standard Mode */}
-                <div className="text-center">
-                  {isLoaded ? (
-                    <LiquidGlass
-                      displacementScale={35}
-                      blurAmount={0.05}
-                      saturation={100}
-                      aberrationIntensity={1}
-                      elasticity={0.1}
-                      cornerRadius={12}
-                      padding="24px 32px"
-                      mode="standard"
-                    >
-                      <div className="text-center">
-                        <h4 className="text-white font-medium text-sm mb-1">
-                          Standard
-                        </h4>
-                        <p className="text-white/70 text-xs">
-                          Balanced
-                        </p>
+                {['standard', 'polar', 'prominent', 'shader'].map((mode) => (
+                  <div key={mode} className="text-center">
+                    {isLoaded ? (
+                      <ErrorBoundary fallback={
+                        <FallbackGlassEffect>
+                          <div className="text-center">
+                            <h4 className="text-white font-medium text-sm mb-1">
+                              {mode.charAt(0).toUpperCase() + mode.slice(1)}
+                            </h4>
+                            <p className="text-white/70 text-xs">
+                              {mode === 'standard' ? 'Balanced' : 
+                               mode === 'polar' ? 'Circular' :
+                               mode === 'prominent' ? 'Enhanced' : 'Advanced'}
+                            </p>
+                          </div>
+                        </FallbackGlassEffect>
+                      }>
+                        <LiquidGlass
+                          displacementScale={35}
+                          blurAmount={0.05}
+                          saturation={100}
+                          aberrationIntensity={1}
+                          elasticity={0.1}
+                          cornerRadius={12}
+                          padding="24px 32px"
+                          mode={mode as any}
+                        >
+                          <div className="text-center">
+                            <h4 className="text-white font-medium text-sm mb-1">
+                              {mode.charAt(0).toUpperCase() + mode.slice(1)}
+                            </h4>
+                            <p className="text-white/70 text-xs">
+                              {mode === 'standard' ? 'Balanced' : 
+                               mode === 'polar' ? 'Circular' :
+                               mode === 'prominent' ? 'Enhanced' : 'Advanced'}
+                            </p>
+                          </div>
+                        </LiquidGlass>
+                      </ErrorBoundary>
+                    ) : (
+                      <div className="bg-white/5 backdrop-blur-sm border border-white/20 rounded-lg p-6 text-white text-sm">
+                        Loading...
                       </div>
-                    </LiquidGlass>
-                  ) : (
-                    <div className="bg-white/5 backdrop-blur-sm border border-white/20 rounded-lg p-6 text-white text-sm">
-                      Loading...
-                    </div>
-                  )}
-                </div>
-
-                {/* Polar Mode */}
-                <div className="text-center">
-                  {isLoaded ? (
-                    <LiquidGlass
-                      displacementScale={35}
-                      blurAmount={0.05}
-                      saturation={100}
-                      aberrationIntensity={1}
-                      elasticity={0.1}
-                      cornerRadius={12}
-                      padding="24px 32px"
-                      mode="polar"
-                    >
-                      <div className="text-center">
-                        <h4 className="text-white font-medium text-sm mb-1">
-                          Polar
-                        </h4>
-                        <p className="text-white/70 text-xs">
-                          Circular
-                        </p>
-                      </div>
-                    </LiquidGlass>
-                  ) : (
-                    <div className="bg-white/5 backdrop-blur-sm border border-white/20 rounded-lg p-6 text-white text-sm">
-                      Loading...
-                    </div>
-                  )}
-                </div>
-
-                {/* Prominent Mode */}
-                <div className="text-center">
-                  {isLoaded ? (
-                    <LiquidGlass
-                      displacementScale={35}
-                      blurAmount={0.05}
-                      saturation={100}
-                      aberrationIntensity={1}
-                      elasticity={0.1}
-                      cornerRadius={12}
-                      padding="24px 32px"
-                      mode="prominent"
-                    >
-                      <div className="text-center">
-                        <h4 className="text-white font-medium text-sm mb-1">
-                          Prominent
-                        </h4>
-                        <p className="text-white/70 text-xs">
-                          Enhanced
-                        </p>
-                      </div>
-                    </LiquidGlass>
-                  ) : (
-                    <div className="bg-white/5 backdrop-blur-sm border border-white/20 rounded-lg p-6 text-white text-sm">
-                      Loading...
-                    </div>
-                  )}
-                </div>
-
-                {/* Shader Mode */}
-                <div className="text-center">
-                  {isLoaded ? (
-                    <LiquidGlass
-                      displacementScale={35}
-                      blurAmount={0.05}
-                      saturation={100}
-                      aberrationIntensity={1}
-                      elasticity={0.1}
-                      cornerRadius={12}
-                      padding="24px 32px"
-                      mode="shader"
-                    >
-                      <div className="text-center">
-                        <h4 className="text-white font-medium text-sm mb-1">
-                          Shader
-                        </h4>
-                        <p className="text-white/70 text-xs">
-                          Advanced
-                        </p>
-                      </div>
-                    </LiquidGlass>
-                  ) : (
-                    <div className="bg-white/5 backdrop-blur-sm border border-white/20 rounded-lg p-6 text-white text-sm">
-                      Loading...
-                    </div>
-                  )}
-                </div>
+                    )}
+                  </div>
+                ))}
 
               </div>
 
@@ -746,13 +740,15 @@ export default function TestThirdPartyPage(): JSX.Element {
                 </h3>
                 <p className="text-white/80 text-sm leading-relaxed mb-4">
                   Advanced WebGL-powered effects inspired by Apple's WWDC 2024 design language. 
-                  Each effect uses real-time mathematical transformations and shader computations 
-                  to create smooth, organic distortions.
+                  {hasLiquidGlass ? 
+                    ' Using liquid-glass-react for authentic liquid distortions.' :
+                    ' Using fallback CSS glass effects for maximum compatibility.'
+                  }
                 </p>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-white/60">Technology:</span>
-                    <span className="text-white">WebGL 2.0 + GLSL</span>
+                    <span className="text-white">{hasLiquidGlass ? 'WebGL 2.0 + GLSL' : 'CSS + Backdrop Filter'}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-white/60">Performance:</span>
@@ -788,7 +784,10 @@ export default function TestThirdPartyPage(): JSX.Element {
                   </div>
                   <div className="mt-4 pt-4 border-t border-white/10">
                     <span className="text-white font-medium">💡 Pro Tip:</span> 
-                    <span className="text-white/70"> Try the preset buttons for quick effect combinations!</span>
+                    <span className="text-white/70"> {hasLiquidGlass ? 
+                      'Try the preset buttons for quick effect combinations!' :
+                      'Fallback mode provides reliable glass effects across all platforms!'
+                    }</span>
                   </div>
                 </div>
               </div>
@@ -798,10 +797,10 @@ export default function TestThirdPartyPage(): JSX.Element {
             {/* 底部技术标签 */}
             <div className="mt-12 flex flex-wrap justify-center gap-3">
               <span className="px-4 py-2 bg-blue-500/20 text-blue-300 rounded-full text-sm border border-blue-400/30">
-                WebGL 2.0
+                {hasLiquidGlass ? 'WebGL 2.0' : 'CSS Backdrop Filter'}
               </span>
               <span className="px-4 py-2 bg-purple-500/20 text-purple-300 rounded-full text-sm border border-purple-400/30">
-                Real-time Shaders
+                {hasLiquidGlass ? 'Real-time Shaders' : 'CSS Animations'}
               </span>
               <span className="px-4 py-2 bg-green-500/20 text-green-300 rounded-full text-sm border border-green-400/30">
                 Hardware Accelerated

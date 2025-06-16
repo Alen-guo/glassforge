@@ -41,5 +41,23 @@
         "@types/three": "^0.159.0",
         "eslint": "^8.56.0",
         "eslint-config-next": "14.0.4"
+    },
+    "overrides": {
+        "liquid-glass-react": {
+            "react": "$react",
+            "react-dom": "$react-dom"
+        }
+    },
+    "resolutions": {
+        "liquid-glass-react/react": "^18.2.0",
+        "liquid-glass-react/react-dom": "^18.2.0"
+    },
+    "peerDependenciesMeta": {
+        "react": {
+            "optional": false
+        },
+        "react-dom": {
+            "optional": false
+        }
     }
 }
