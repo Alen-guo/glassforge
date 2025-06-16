@@ -63,11 +63,24 @@ body,
         sans-serif !important;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: url('/images/banner2.jpg') center center / cover no-repeat fixed;
     min-height: 100vh;
     font-weight: 400;
     line-height: 1.5;
     color: white;
+}
+
+/* 为了确保文本可读性，添加一个覆盖层 */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: -1;
+    pointer-events: none;
 }
 
 /* 确保粗体文字在页面刷新后保持一致 */

@@ -56,7 +56,8 @@ export default function GeneratorClient() {
       transparency, blur, borderOpacity, reflection, depth, 
       width, height, padding, borderRadius, borderWidth,
       shadowType, gradientOverlay, innerGlow,
-      enableAnimation, animationDuration, hoverEffect
+      enableAnimation, animationDuration, hoverEffect,
+      backgroundColorType, backgroundColor, backgroundOpacity, gradientColors, gradientDirection
     } = glassParams;
 
     // 根据阴影类型调整阴影
@@ -76,11 +77,40 @@ export default function GeneratorClient() {
       }
     };
 
+    // 生成背景颜色
+    const getBackgroundColor = () => {
+      const opacity = backgroundOpacity / 100;
+      
+      switch (backgroundColorType) {
+        case 'white':
+          return `rgba(255, 255, 255, ${opacity})`;
+        case 'custom':
+          // 将HEX转换为RGB并添加透明度
+          const hex = backgroundColor.replace('#', '');
+          const r = parseInt(hex.substr(0, 2), 16);
+          const g = parseInt(hex.substr(2, 2), 16);
+          const b = parseInt(hex.substr(4, 2), 16);
+          return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+        case 'gradient':
+          // 创建渐变背景
+          const gradientColorsWithOpacity = gradientColors.map(color => {
+            const hex = color.replace('#', '');
+            const r = parseInt(hex.substr(0, 2), 16);
+            const g = parseInt(hex.substr(2, 2), 16);
+            const b = parseInt(hex.substr(4, 2), 16);
+            return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+          });
+          return `linear-gradient(${gradientDirection.replace('-', ' ')}, ${gradientColorsWithOpacity.join(', ')})`;
+        default:
+          return `rgba(255, 255, 255, ${transparency / 100})`;
+      }
+    };
+
     return {
       width: `${width}px`,
       height: `${height}px`,
       padding: `${padding}px`,
-      background: `rgba(255, 255, 255, ${transparency / 100})`,
+      background: getBackgroundColor(),
       backdropFilter: `blur(${blur}px)`,
       WebkitBackdropFilter: `blur(${blur}px)`,
       border: `${borderWidth}px solid rgba(255, 255, 255, ${borderOpacity / 100})`,
@@ -88,7 +118,7 @@ export default function GeneratorClient() {
       boxShadow: innerGlow 
         ? `${getShadow()}, inset 0 1px 0 rgba(255, 255, 255, ${reflection / 100})`
         : getShadow(),
-      backgroundImage: gradientOverlay 
+      backgroundImage: gradientOverlay && backgroundColorType !== 'gradient'
         ? `linear-gradient(135deg, rgba(255, 255, 255, ${reflection / 300}), transparent 50%)`
         : 'none',
       transition: enableAnimation ? `all ${animationDuration}ms cubic-bezier(0.4, 0.0, 0.2, 1)` : 'none',
@@ -151,7 +181,13 @@ export default function GeneratorClient() {
     <>
       <Navbar />
       
-      <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 pt-20">
+      <div 
+        className="min-h-screen pt-20 bg-cover bg-center bg-no-repeat relative"
+        style={{
+          backgroundImage: `url('/images/banner2.jpg')`,
+        }}
+      >
+        <div className="absolute inset-0 bg-black/40"></div>
         <div className="max-w-7xl mx-auto px-6 py-12">
           
           {/* Page Header */}
@@ -439,6 +475,143 @@ export default function GeneratorClient() {
                   </div>
 
                   {/* 新增：视觉效果 */}
+                  <div className="border-t border-white/20 pt-6">
+                    <h4 className="text-white font-semibold text-sm mb-4">🎨 Background Color</h4>
+                    
+                    {/* 背景颜色类型选择 */}
+                    <div className="mb-4">
+                      <label className="text-white text-sm font-medium mb-2 block">Color Type</label>
+                      <div className="grid grid-cols-3 gap-2">
+                        {[
+                          { value: 'white', label: 'White', icon: '⚪' },
+                          { value: 'custom', label: 'Custom', icon: '🎨' },
+                          { value: 'gradient', label: 'Gradient', icon: '🌈' }
+                        ].map((type) => (
+                          <button
+                            key={type.value}
+                            onClick={() => updateParam('backgroundColorType', type.value)}
+                            className={`p-2 rounded-lg text-xs transition-all ${
+                              glassParams.backgroundColorType === type.value
+                                ? 'bg-blue-500/20 border border-blue-400 text-blue-300'
+                                : 'bg-white/5 border border-white/20 text-white/70 hover:bg-white/10'
+                            }`}
+                          >
+                            <div className="text-center">
+                              <div className="text-sm mb-1">{type.icon}</div>
+                              <div className="font-medium">{type.label}</div>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* 自定义颜色选择器 */}
+                    {glassParams.backgroundColorType === 'custom' && (
+                      <div className="mb-4">
+                        <div className="flex justify-between items-center mb-2">
+                          <label className="text-white text-sm font-medium">Custom Color</label>
+                          <span className="text-blue-300 text-sm font-mono">{glassParams.backgroundColor}</span>
+                        </div>
+                        <div className="flex items-center space-x-3">
+                          <input
+                            type="color"
+                            value={glassParams.backgroundColor}
+                            onChange={(e) => updateParam('backgroundColor', e.target.value)}
+                            className="w-12 h-8 rounded border border-white/20 bg-transparent cursor-pointer"
+                          />
+                          <input
+                            type="text"
+                            value={glassParams.backgroundColor}
+                            onChange={(e) => updateParam('backgroundColor', e.target.value)}
+                            className="flex-1 bg-white/5 border border-white/20 rounded px-3 py-1 text-white text-sm font-mono"
+                            placeholder="#ffffff"
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {/* 渐变颜色设置 */}
+                    {glassParams.backgroundColorType === 'gradient' && (
+                      <div className="mb-4">
+                        <label className="text-white text-sm font-medium mb-2 block">Gradient Colors</label>
+                        <div className="space-y-2">
+                          {glassParams.gradientColors.map((color, index) => (
+                            <div key={index} className="flex items-center space-x-2">
+                              <input
+                                type="color"
+                                value={color}
+                                onChange={(e) => {
+                                  const newColors = [...glassParams.gradientColors];
+                                  newColors[index] = e.target.value;
+                                  updateParam('gradientColors', newColors);
+                                }}
+                                className="w-8 h-6 rounded border border-white/20 bg-transparent cursor-pointer"
+                              />
+                              <input
+                                type="text"
+                                value={color}
+                                onChange={(e) => {
+                                  const newColors = [...glassParams.gradientColors];
+                                  newColors[index] = e.target.value;
+                                  updateParam('gradientColors', newColors);
+                                }}
+                                className="flex-1 bg-white/5 border border-white/20 rounded px-2 py-1 text-white text-xs font-mono"
+                              />
+                            </div>
+                          ))}
+                        </div>
+                        
+                        {/* 渐变方向选择 */}
+                        <div className="mt-3">
+                          <label className="text-white text-sm font-medium mb-2 block">Direction</label>
+                          <select 
+                            value={glassParams.gradientDirection}
+                            onChange={(e) => updateParam('gradientDirection', e.target.value)}
+                            className="w-full glass-select text-sm"
+                          >
+                            <option value="to-r">Left to Right</option>
+                            <option value="to-br">Top-Left to Bottom-Right</option>
+                            <option value="to-b">Top to Bottom</option>
+                            <option value="to-bl">Top-Right to Bottom-Left</option>
+                            <option value="to-l">Right to Left</option>
+                            <option value="to-tl">Bottom-Right to Top-Left</option>
+                            <option value="to-t">Bottom to Top</option>
+                            <option value="to-tr">Bottom-Left to Top-Right</option>
+                          </select>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* 背景透明度 */}
+                    <div>
+                      <div className="flex justify-between items-center mb-2">
+                        <label className="text-white text-sm font-medium">Background Opacity</label>
+                        <span className="text-blue-300 text-sm font-mono">{glassParams.backgroundOpacity}%</span>
+                      </div>
+                      <input
+                        type="range"
+                        min="0"
+                        max="100"
+                        value={glassParams.backgroundOpacity}
+                        onChange={(e) => updateParam('backgroundOpacity', parseInt(e.target.value))}
+                        className="glass-slider w-full"
+                      />
+                      <div className="flex justify-between items-center mt-1 text-xs">
+                        <span className="text-white/60">💡 Controls background visibility</span>
+                        <span className={`px-2 py-1 rounded text-xs ${
+                          glassParams.backgroundOpacity <= 30 
+                            ? 'bg-green-500/20 text-green-300' 
+                            : glassParams.backgroundOpacity <= 60 
+                            ? 'bg-yellow-500/20 text-yellow-300'
+                            : 'bg-red-500/20 text-red-300'
+                        }`}>
+                          {glassParams.backgroundOpacity <= 30 ? 'Subtle' : glassParams.backgroundOpacity <= 60 ? 'Balanced' : 'Strong'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 视觉效果 */}
                   <div className="border-t border-white/20 pt-6">
                     <h4 className="text-white font-semibold text-sm mb-4">✨ Visual Effects</h4>
                     

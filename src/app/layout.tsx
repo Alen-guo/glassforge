@@ -25,18 +25,18 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL('https://glassforge.dev'),
+  metadataBase: new URL('https://www.liquidglass.space'),
   alternates: {
     canonical: '/',
   },
   openGraph: {
     title: 'GlassForge - Professional Liquid Glass Effect Generator',
     description: 'Create stunning Apple-style liquid glass effects with our advanced online generator. Export to CSS, React, Vue, Flutter and more.',
-    url: 'https://glassforge.dev',
+    url: 'https://www.liquidglass.space',
     siteName: 'GlassForge',
     images: [
       {
-        url: '/og-image.jpg',
+        url: '/images/banner2.jpg',
         width: 1200,
         height: 630,
         alt: 'GlassForge Liquid Glass Generator',
@@ -49,8 +49,8 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'GlassForge - Liquid Glass Effect Generator',
     description: 'Create stunning Apple-style liquid glass effects online for free',
-    images: ['/twitter-image.jpg'],
-    creator: '@glassforge',
+    images: ['/images/banner2.jpg'],
+    creator: '@liquidglassui',
   },
   robots: {
     index: true,

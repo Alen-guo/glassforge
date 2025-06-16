@@ -18,6 +18,13 @@ export const DEFAULT_GLASS_PARAMS: GlassEffectParams = {
   reflection: 50,
   depth: 5,
 
+  // 背景颜色控制
+  backgroundColorType: 'white',
+  backgroundColor: '#ffffff',
+  backgroundOpacity: 10,
+  gradientColors: ['#ffffff', '#f0f0f0'],
+  gradientDirection: 'to-br',
+
   // 尺寸和形状
   width: 300,
   height: 180,
@@ -52,6 +59,12 @@ export const GLASS_PRESETS: Record<GlassPresetType, GlassPreset> = {
       borderOpacity: 20,
       reflection: 30,
       depth: 4,
+      // 背景颜色控制 - iOS 经典白色
+      backgroundColorType: 'white',
+      backgroundColor: '#ffffff',
+      backgroundOpacity: 15,
+      gradientColors: ['#ffffff', '#f8f9fa'],
+      gradientDirection: 'to-br',
       // 尺寸和形状
       width: 280,
       height: 160,
@@ -80,6 +93,12 @@ export const GLASS_PRESETS: Record<GlassPresetType, GlassPreset> = {
       borderOpacity: 8,
       reflection: 80,
       depth: 8,
+      // 背景颜色控制 - Vision Pro 蓝紫渐变
+      backgroundColorType: 'gradient',
+      backgroundColor: '#8b5cf6',
+      backgroundOpacity: 8,
+      gradientColors: ['#8b5cf6', '#3b82f6', '#06b6d4'],
+      gradientDirection: 'to-br',
       width: 350,
       height: 220,
       padding: 32,
@@ -105,6 +124,12 @@ export const GLASS_PRESETS: Record<GlassPresetType, GlassPreset> = {
       borderOpacity: 35,
       reflection: 25,
       depth: 4,
+      // 背景颜色控制 - macOS 系统灰色
+      backgroundColorType: 'custom',
+      backgroundColor: '#f5f5f7',
+      backgroundOpacity: 25,
+      gradientColors: ['#f5f5f7', '#e5e5e7'],
+      gradientDirection: 'to-b',
       width: 320,
       height: 190,
       padding: 24,
@@ -130,6 +155,12 @@ export const GLASS_PRESETS: Record<GlassPresetType, GlassPreset> = {
       borderOpacity: 45,
       reflection: 10,
       depth: 6,
+      // 背景颜色控制 - Material Design 主题色
+      backgroundColorType: 'custom',
+      backgroundColor: '#1976d2',
+      backgroundOpacity: 20,
+      gradientColors: ['#1976d2', '#1565c0'],
+      gradientDirection: 'to-r',
       width: 300,
       height: 170,
       padding: 20,
@@ -852,6 +883,13 @@ export function validateGlassParams(params: Partial<GlassEffectParams>): GlassEf
     borderOpacity: Math.max(5, Math.min(60, params.borderOpacity ?? DEFAULT_GLASS_PARAMS.borderOpacity)),
     reflection: Math.max(0, Math.min(80, params.reflection ?? DEFAULT_GLASS_PARAMS.reflection)),
     depth: Math.max(1, Math.min(8, params.depth ?? DEFAULT_GLASS_PARAMS.depth)),
+
+    // 背景颜色控制
+    backgroundColorType: params.backgroundColorType ?? DEFAULT_GLASS_PARAMS.backgroundColorType,
+    backgroundColor: params.backgroundColor ?? DEFAULT_GLASS_PARAMS.backgroundColor,
+    backgroundOpacity: Math.max(0, Math.min(100, params.backgroundOpacity ?? DEFAULT_GLASS_PARAMS.backgroundOpacity)),
+    gradientColors: params.gradientColors ?? DEFAULT_GLASS_PARAMS.gradientColors,
+    gradientDirection: params.gradientDirection ?? DEFAULT_GLASS_PARAMS.gradientDirection,
 
     // 尺寸和形状 - 适应预览区域
     width: Math.max(150, Math.min(500, params.width ?? DEFAULT_GLASS_PARAMS.width)),

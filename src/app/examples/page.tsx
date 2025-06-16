@@ -117,7 +117,13 @@ export default function ExamplesPage() {
     <>
       <Navbar />
       
-      <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 pt-20">
+      <div 
+        className="min-h-screen pt-20 bg-cover bg-center bg-no-repeat relative"
+        style={{
+          backgroundImage: `url('/images/banner2.jpg')`,
+        }}
+      >
+        <div className="absolute inset-0 bg-black/40"></div>
         <div className="max-w-7xl mx-auto px-6 py-12">
           
           {/* Page Header */}

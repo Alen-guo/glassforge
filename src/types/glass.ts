@@ -16,6 +16,18 @@ export interface GlassEffectParams {
     /** 深度层级 (1-10) */
     depth: number;
 
+    // 背景颜色控制
+    /** 背景颜色类型 */
+    backgroundColorType: 'white' | 'custom' | 'gradient';
+    /** 自定义背景颜色 (HEX) */
+    backgroundColor: string;
+    /** 背景透明度 (0-100) */
+    backgroundOpacity: number;
+    /** 渐变颜色数组 */
+    gradientColors: string[];
+    /** 渐变方向 */
+    gradientDirection: 'to-r' | 'to-br' | 'to-b' | 'to-bl' | 'to-l' | 'to-tl' | 'to-t' | 'to-tr';
+
     // 尺寸和形状
     /** 宽度 (100-800px) */
     width: number;

@@ -9,10 +9,15 @@ export default function AboutPage(): JSX.Element {
     <>
       {/* Hero Section */}
       <section className="min-h-screen relative overflow-hidden pt-20">
-        <div className="absolute inset-0 bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900">
-          <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-20"></div>
-          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{
+            backgroundImage: `url('/images/banner2.jpg')`,
+            backgroundAttachment: 'fixed'
+          }}
+        >
+          <div className="absolute inset-0 bg-black/40"></div>
+          <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10"></div>
         </div>
 
         {/* 导航栏 */}

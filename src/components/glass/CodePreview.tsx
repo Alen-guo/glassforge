@@ -1,9 +1,21 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import React, { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import { Copy, CheckCircle } from 'lucide-react';
+
+// 动态导入语法高亮器，避免SSR问题
+const SyntaxHighlighter = dynamic(
+  () => import('react-syntax-highlighter').then(mod => mod.Prism),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="bg-gray-900 rounded-b-lg p-4 text-gray-400 text-sm">
+        Loading syntax highlighter...
+      </div>
+    )
+  }
+);
 
 interface CodePreviewProps {
   code: string;
@@ -13,14 +25,35 @@ interface CodePreviewProps {
 
 export default function CodePreview({ code, language, fileName }: CodePreviewProps) {
   const [copied, setCopied] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+  const [style, setStyle] = useState<any>(null);
+
+  useEffect(() => {
+    setIsClient(true);
+    // 动态加载样式
+    import('react-syntax-highlighter/dist/esm/styles/prism').then(styles => {
+      setStyle(styles.vscDarkPlus);
+    });
+  }, []);
 
   const handleCopy = async () => {
+    if (!isClient) return;
+    
     try {
       await navigator.clipboard.writeText(code);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (error) {
       console.error('Failed to copy:', error);
+      // 降级方案
+      const textArea = document.createElement('textarea');
+      textArea.value = code;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
     }
   };
 
@@ -60,6 +93,7 @@ export default function CodePreview({ code, language, fileName }: CodePreviewPro
         <button
           onClick={handleCopy}
           className="text-gray-400 hover:text-white transition-colors flex items-center space-x-1 text-sm"
+          disabled={!isClient}
         >
           {copied ? (
             <>
@@ -77,22 +111,29 @@ export default function CodePreview({ code, language, fileName }: CodePreviewPro
 
       {/* 代码预览 */}
       <div className="relative">
-        <SyntaxHighlighter
-          language={getLanguage()}
-          style={vscDarkPlus}
-          customStyle={{
-            margin: 0,
-            borderRadius: '0 0 0.5rem 0.5rem',
-            background: '#1a1a1a',
-            fontSize: '0.875rem',
-            lineHeight: '1.5',
-          }}
-          showLineNumbers
-          wrapLines
-          wrapLongLines
-        >
-          {code}
-        </SyntaxHighlighter>
+        {isClient && style ? (
+          <SyntaxHighlighter
+            language={getLanguage()}
+            style={style}
+            customStyle={{
+              margin: 0,
+              borderRadius: '0 0 0.5rem 0.5rem',
+              background: '#1a1a1a',
+              fontSize: '0.875rem',
+              lineHeight: '1.5',
+            }}
+            showLineNumbers
+            wrapLines
+            wrapLongLines
+          >
+            {code}
+          </SyntaxHighlighter>
+        ) : (
+          // 服务端渲染降级方案
+          <div className="bg-gray-900 rounded-b-lg p-4 text-gray-300 text-sm font-mono whitespace-pre-wrap overflow-x-auto">
+            {code}
+          </div>
+        )}
       </div>
 
       {/* 语言标签 */}

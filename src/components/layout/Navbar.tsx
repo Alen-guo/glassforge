@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import GlassButton from '@/components/glass/GlassButton';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -10,6 +11,7 @@ const Navbar = () => {
   const navItems = [
     { href: '/', label: 'Home' },
     { href: '/generator', label: 'Generator' },
+    { href: '/test-third-party', label: 'Parameter Tester' },
     { href: '/examples', label: 'Examples' },
     { href: '/tutorials', label: 'Tutorials' },
     { href: '/docs', label: 'Docs' },
@@ -33,16 +35,27 @@ const Navbar = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            {navItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="text-gray-300 hover:text-white transition-colors duration-200 text-sm font-medium relative group"
-              >
-                {item.label}
-                <span className="absolute -bottom-2 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-400 to-purple-500 transition-all duration-300 group-hover:w-full"></span>
-              </Link>
-            ))}
+            <Link href="/" className="text-white/80 hover:text-white transition-colors">
+              Home
+            </Link>
+            <Link href="/generator" className="text-white/80 hover:text-white transition-colors">
+              Generator
+            </Link>
+            <Link href="/test-third-party" className="text-white/80 hover:text-white transition-colors font-medium">
+              Parameter Tester
+            </Link>
+            <Link href="/examples" className="text-white/80 hover:text-white transition-colors">
+              Examples
+            </Link>
+            <Link href="/docs" className="text-white/80 hover:text-white transition-colors">
+              Docs
+            </Link>
+            <Link href="/tutorials" className="text-white/80 hover:text-white transition-colors">
+              Tutorials
+            </Link>
+            <Link href="/about" className="text-white/80 hover:text-white transition-colors">
+              About
+            </Link>
           </div>
 
           {/* Action Buttons */}
@@ -52,12 +65,13 @@ const Navbar = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
               </svg>
             </button>
-            <Link
+            <GlassButton
               href="/generator"
-              className="glass-button px-4 py-2 text-sm font-medium text-white rounded-lg transition-all duration-300 hover:scale-105"
+              variant="primary"
+              size="sm"
             >
               Start Creating
-            </Link>
+            </GlassButton>
           </div>
 
           {/* Mobile menu button */}
@@ -98,13 +112,15 @@ const Navbar = () => {
                 </Link>
               ))}
               <div className="pt-4 border-t border-white/10">
-                <Link
+                <GlassButton
                   href="/generator"
-                  className="block glass-button px-4 py-2 text-sm font-medium text-white rounded-lg text-center"
+                  variant="primary"
+                  size="sm"
+                  className="block text-center"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Start Creating
-                </Link>
+                </GlassButton>
               </div>
             </div>
           </motion.div>
