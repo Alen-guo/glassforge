@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
-import { Copy, Download, Settings, Sparkles, Code, Palette, CheckCircle, RefreshCw, Heart } from 'lucide-react';
+import React, { useState, useCallback, useEffect, useMemo, useRef } from 'react';
+import { Copy, Download, Settings, Sparkles, Code, Palette, CheckCircle, Heart, Link2, Save, Upload } from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
 import { useGlassActions, useGlassParams, useCurrentPreset } from '@/hooks/use-glass-store';
 import { ExportFormat } from '@/types/glass';
 import Navbar from '@/components/layout/Navbar';
@@ -14,6 +15,11 @@ export default function GeneratorClient() {
   const [copySuccess, setCopySuccess] = useState(false);
   const [exportFormat, setExportFormat] = useState<ExportFormat>('css');
   const [backgroundImage, setBackgroundImage] = useState<string>('banner1.jpg');
+  const [actionMessage, setActionMessage] = useState<string | null>(null);
+  const importInputRef = useRef<HTMLInputElement | null>(null);
+  const messageTimeoutRef = useRef<number | null>(null);
+  const restoredSettingsRef = useRef<string | null>(null);
+  const searchParams = useSearchParams();
   
   // 使用玻璃效果状态管理
   const currentPreset = useCurrentPreset();
@@ -21,34 +27,73 @@ export default function GeneratorClient() {
   const {
     applyPreset,
     updateParam,
-    generateCSS,
-    generateReactCode,
-    generateVueCode,
-    generateFlutterCode,
+    generateCode,
+    exportSettings,
+    importSettings,
     resetParams
   } = useGlassActions();
+
+  const flashMessage = useCallback((message: string) => {
+    setActionMessage(message);
+    if (messageTimeoutRef.current) {
+      window.clearTimeout(messageTimeoutRef.current);
+    }
+    messageTimeoutRef.current = window.setTimeout(() => {
+      setActionMessage(null);
+    }, 2500);
+  }, []);
 
   // 复制到剪贴板功能
   const copyToClipboard = useCallback(async (text: string) => {
     try {
       await navigator.clipboard.writeText(text);
       setCopySuccess(true);
+      flashMessage('Code copied to clipboard.');
       setTimeout(() => setCopySuccess(false), 2000);
     } catch (error) {
       console.error('Failed to copy:', error);
     }
+  }, [flashMessage]);
+
+  useEffect(() => {
+    const serializedSettings = searchParams.get('params');
+
+    if (!serializedSettings || restoredSettingsRef.current === serializedSettings) {
+      return;
+    }
+
+    const restored = importSettings(serializedSettings);
+
+    if (restored) {
+      restoredSettingsRef.current = serializedSettings;
+      flashMessage('Shared settings restored.');
+    }
+  }, [flashMessage, importSettings, searchParams]);
+
+  useEffect(() => {
+    return () => {
+      if (messageTimeoutRef.current) {
+        window.clearTimeout(messageTimeoutRef.current);
+      }
+    };
   }, []);
+
+  const exportConfig = useMemo(() => ({
+    format: exportFormat,
+    includeComments: true,
+    minify: false,
+    classPrefix: currentPreset === 'custom' ? 'GlassForge' : `Glass${currentPreset.replace(/(^|-)(\w)/g, (_, __, char) => char.toUpperCase())}`,
+  }), [currentPreset, exportFormat]);
 
   // 获取当前格式的代码
   const getCurrentCode = useCallback(() => {
-    switch (exportFormat) {
-      case 'css': return generateCSS();
-      case 'react': return generateReactCode();
-      case 'vue': return generateVueCode();
-      case 'flutter': return generateFlutterCode();
-      default: return generateCSS();
-    }
-  }, [exportFormat, generateCSS, generateReactCode, generateVueCode, generateFlutterCode]);
+    return generateCode(exportFormat, exportConfig);
+  }, [exportConfig, exportFormat, generateCode]);
+
+  const exportFileName = useMemo(() => {
+    const presetSlug = currentPreset.replace(/[^a-z0-9-]/gi, '-').toLowerCase();
+    return `glassforge-${presetSlug}.${getFileExtension()}`;
+  }, [currentPreset, exportFormat]);
 
   // 生成实时样式对象
   const getLiveGlassStyle = useCallback(() => {
@@ -127,7 +172,7 @@ export default function GeneratorClient() {
   }, [glassParams]);
 
   // 添加文件扩展名获取函数
-  const getFileExtension = () => {
+  function getFileExtension() {
     switch (exportFormat) {
       case 'css':
       case 'tailwind':
@@ -154,7 +199,7 @@ export default function GeneratorClient() {
       default:
         return 'txt';
     }
-  };
+  }
 
   // 导出图片功能
   const handleExportImage = async () => {
@@ -169,26 +214,44 @@ export default function GeneratorClient() {
 
   // 分享链接功能
   const handleShareLink = async () => {
-    // 假设glassParams是可序列化的
-    const params = encodeURIComponent(JSON.stringify(glassParams));
+    const params = encodeURIComponent(exportSettings());
     const url = `${window.location.origin}/generator?params=${params}`;
     await navigator.clipboard.writeText(url);
-    setCopySuccess(true);
-    setTimeout(() => setCopySuccess(false), 2000);
+    flashMessage('Shareable generator link copied.');
   };
+
+  const handleExportSettings = useCallback(() => {
+    const blob = new Blob([exportSettings()], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `glassforge-${currentPreset}-settings.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    flashMessage('Settings exported as JSON.');
+  }, [currentPreset, exportSettings, flashMessage]);
+
+  const handleImportSettings = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    const content = await file.text();
+    const restored = importSettings(content);
+    flashMessage(restored ? 'Settings imported successfully.' : 'Unable to import that settings file.');
+    event.target.value = '';
+  }, [flashMessage, importSettings]);
 
   return (
     <>
       <Navbar />
       
-      <div 
-        className="min-h-screen pt-20 bg-cover bg-center bg-no-repeat relative"
-        style={{
-          backgroundImage: `url('/images/banner2.jpg')`,
-        }}
-      >
-        <div className="absolute inset-0 bg-black/40"></div>
-        <div className="max-w-7xl mx-auto px-6 py-12">
+      <div className="page-shell pt-20">
+        <div className="page-content max-w-7xl mx-auto px-6 py-12">
           
           {/* Page Header */}
           <div className="text-center mb-12">
@@ -213,6 +276,41 @@ export default function GeneratorClient() {
                 <span>Apple Design System</span>
               </div>
             </div>
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+              <button
+                onClick={handleShareLink}
+                className="glass-button text-white px-4 py-2 text-sm flex items-center space-x-2"
+              >
+                <Link2 className="w-4 h-4" />
+                <span>Copy Share Link</span>
+              </button>
+              <button
+                onClick={handleExportSettings}
+                className="glass-button text-white px-4 py-2 text-sm flex items-center space-x-2"
+              >
+                <Save className="w-4 h-4" />
+                <span>Save Settings</span>
+              </button>
+              <button
+                onClick={() => importInputRef.current?.click()}
+                className="glass-button text-white px-4 py-2 text-sm flex items-center space-x-2"
+              >
+                <Upload className="w-4 h-4" />
+                <span>Load Settings</span>
+              </button>
+              <input
+                ref={importInputRef}
+                type="file"
+                accept="application/json"
+                className="hidden"
+                onChange={handleImportSettings}
+              />
+            </div>
+            {actionMessage && (
+              <div className="mt-4 inline-flex items-center rounded-full border border-blue-400/30 bg-blue-500/10 px-4 py-2 text-sm text-blue-100">
+                {actionMessage}
+              </div>
+            )}
           </div>
 
           {/* 生成器主界面 - 新的布局 */}
@@ -1010,15 +1108,15 @@ export default function GeneratorClient() {
                     <CodePreview
                       code={getCurrentCode()}
                       language={exportFormat}
-                      fileName={`liquid-glass-${exportFormat}-${Date.now()}.${getFileExtension()}`}
+                      fileName={exportFileName}
                     />
                   </div>
 
                   {/* 导出按钮 */}
-                  <div className="flex space-x-2 mt-4">
+                  <div className="grid grid-cols-2 gap-2 mt-4">
                     <button
                       onClick={() => copyToClipboard(getCurrentCode())}
-                      className="flex-1 glass-button text-white py-3 text-sm flex items-center justify-center space-x-2"
+                      className="glass-button text-white py-3 text-sm flex items-center justify-center space-x-2"
                     >
                       {copySuccess ? <CheckCircle className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                       <span>{copySuccess ? 'Copied!' : 'Copy Code'}</span>
@@ -1029,15 +1127,29 @@ export default function GeneratorClient() {
                         const url = URL.createObjectURL(blob);
                         const a = document.createElement('a');
                         a.href = url;
-                        a.download = `liquid-glass-${exportFormat}-${Date.now()}.${getFileExtension()}`;
+                        a.download = exportFileName;
                         document.body.appendChild(a);
                         a.click();
                         document.body.removeChild(a);
                         URL.revokeObjectURL(url);
                       }}
-                      className="glass-button text-white px-4 py-3 text-sm"
+                      className="glass-button text-white px-4 py-3 text-sm flex items-center justify-center"
                     >
                       <Download className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={handleShareLink}
+                      className="glass-button text-white py-3 text-sm flex items-center justify-center space-x-2"
+                    >
+                      <Link2 className="w-4 h-4" />
+                      <span>Share Config</span>
+                    </button>
+                    <button
+                      onClick={handleExportSettings}
+                      className="glass-button text-white py-3 text-sm flex items-center justify-center space-x-2"
+                    >
+                      <Save className="w-4 h-4" />
+                      <span>Export JSON</span>
                     </button>
                   </div>
 
@@ -1046,9 +1158,9 @@ export default function GeneratorClient() {
                     <h4 className="text-blue-300 text-sm font-medium mb-2">💡 Export Tips</h4>
                     <ul className="text-white/70 text-xs space-y-2">
                       <li>• CSS: Perfect for static websites and simple implementations</li>
-                      <li>• React: Includes TypeScript types and proper component structure</li>
-                      <li>• Vue: Uses Composition API with TypeScript support</li>
-                      <li>• Flutter: Ready-to-use widget with proper state management</li>
+                      <li>• Tailwind and React TS are best starting points for production UI teams</li>
+                      <li>• Share Config copies a live link that restores the full generator state</li>
+                      <li>• Export JSON creates a reusable settings snapshot for your design system</li>
                     </ul>
                   </div>
                 </div>

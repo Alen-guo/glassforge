@@ -48,10 +48,6 @@
             "react-dom": "$react-dom"
         }
     },
-    "resolutions": {
-        "liquid-glass-react/react": "^18.2.0",
-        "liquid-glass-react/react-dom": "^18.2.0"
-    },
     "peerDependenciesMeta": {
         "react": {
             "optional": false

@@ -6,14 +6,8 @@ export default function NotFound(): JSX.Element {
     <>
       <Navbar />
       
-      <div 
-        className="min-h-screen pt-20 bg-cover bg-center bg-no-repeat relative"
-        style={{
-          backgroundImage: `url('/images/banner2.jpg')`,
-        }}
-      >
-        <div className="absolute inset-0 bg-black/40"></div>
-        <div className="max-w-4xl mx-auto px-6 py-12 text-center">
+      <div className="page-shell pt-20">
+        <div className="page-content max-w-4xl mx-auto px-6 py-12 text-center">
           
           {/* 404标题 */}
           <div className="glass-card p-12 mb-8">

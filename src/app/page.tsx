@@ -16,19 +16,21 @@ export default function HomePage(): JSX.Element {
       {/* Hero Section - 强大的SEO第一屏 */}
       <section className="min-h-screen relative overflow-hidden">
         {/* 背景图片 */}
-        <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        <div
+          className="absolute inset-0"
           style={{
-            backgroundImage: `url('/images/banner2.jpg')`,
-            backgroundAttachment: 'fixed'
+            backgroundImage: "linear-gradient(180deg, rgba(6, 14, 30, 0.28), rgba(6, 14, 30, 0.72)), url('/images/banner2.jpg')",
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat'
           }}
-        >
-          <div className="absolute inset-0 bg-black/40"></div>
-          <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10"></div>
-        </div>
+        />
+        <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
+        <div className="absolute -top-24 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-cyan-300/25 blur-3xl" />
+        <div className="absolute top-36 right-12 h-44 w-44 rounded-full bg-purple-300/20 blur-3xl" />
 
         {/* Hero Content */}
-        <div className="relative z-10 pt-24 pb-16 px-6">
+        <div className="relative z-10 pt-24 pb-20 px-6">
           <div className="max-w-7xl mx-auto text-center">
             {/* 主标题 - SEO H1 */}
             <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
@@ -47,25 +49,30 @@ export default function HomePage(): JSX.Element {
             </p>
 
             {/* CTA按钮组 */}
-            <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-6 mb-12">
+            <div className="flex flex-col items-center justify-center space-y-5 mb-12">
               <GlassButton href="/generator" variant="primary" size="lg">
                 <div className="flex items-center space-x-3">
                   <Play className="w-5 h-5" />
-                  <span>Start Creating Free</span>
+                  <span>Open The Generator</span>
                 </div>
               </GlassButton>
-              <GlassButton href="/test-third-party" variant="secondary" size="lg">
-                <div className="flex items-center space-x-3">
-                  <Zap className="w-5 h-5" />
-                  <span>Parameter Tester</span>
-                </div>
-              </GlassButton>
-              <GlassButton href="/examples" variant="outline" size="lg">
-                <div className="flex items-center space-x-3">
-                  <Globe className="w-5 h-5" />
-                  <span>View Examples</span>
-                </div>
-              </GlassButton>
+              <div className="flex flex-wrap items-center justify-center gap-5 text-sm text-white/75">
+                <Link href="/examples" className="inline-flex items-center space-x-2 hover:text-white transition-colors">
+                  <Globe className="w-4 h-4" />
+                  <span>Browse Examples</span>
+                </Link>
+                <Link href="/docs" className="inline-flex items-center space-x-2 hover:text-white transition-colors">
+                  <Code className="w-4 h-4" />
+                  <span>Read Docs</span>
+                </Link>
+                <Link href="/test-third-party" className="inline-flex items-center space-x-2 hover:text-white transition-colors">
+                  <Zap className="w-4 h-4" />
+                  <span>Open Advanced Playground</span>
+                </Link>
+              </div>
+              <p className="text-sm text-white/60 max-w-2xl mx-auto">
+                Start in the generator first. Use examples and docs after you have a working preset.
+              </p>
             </div>
 
             {/* 社会证明 */}
@@ -82,6 +89,30 @@ export default function HomePage(): JSX.Element {
                 <Zap className="w-4 h-4" />
                 <span>1M+ Effects Created</span>
               </div>
+            </div>
+
+            <div className="mt-12 max-w-5xl mx-auto">
+              <GlassCard preset="vision-pro" className="p-4 md:p-6">
+                <div className="rounded-2xl p-8 md:p-12 feature-preview-surface flex flex-col md:flex-row items-center gap-8 text-left">
+                  <div className="flex-1">
+                    <p className="text-cyan-200 text-xs uppercase tracking-[0.22em] mb-3">Hero Preview</p>
+                    <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">Beautiful Banner-First Experience</h2>
+                    <p className="text-white/75 text-sm md:text-base">Keep the premium visual feel while generating production-ready liquid glass code.</p>
+                  </div>
+                  <div className="w-full md:w-[340px]">
+                    <div className="rounded-xl border border-white/15 bg-white/10 backdrop-blur-xl p-5 space-y-3">
+                      <div className="h-2 rounded bg-white/25" />
+                      <div className="h-2 w-4/5 rounded bg-white/20" />
+                      <div className="h-2 w-3/5 rounded bg-white/20" />
+                      <div className="flex gap-2 pt-2">
+                        <span className="px-3 py-1 rounded-full text-xs bg-cyan-400/20 text-cyan-200">iOS</span>
+                        <span className="px-3 py-1 rounded-full text-xs bg-purple-400/20 text-purple-200">Vision Pro</span>
+                        <span className="px-3 py-1 rounded-full text-xs bg-pink-400/20 text-pink-200">Web</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </GlassCard>
             </div>
           </div>
         </div>
@@ -133,6 +164,24 @@ export default function HomePage(): JSX.Element {
               </p>
             </GlassCard>
           </div>
+        </div>
+      </section>
+
+      {/* SEO 内链资源区块 */}
+      <section className="py-16 relative">
+        <div className="max-w-6xl mx-auto px-6">
+          <GlassCard preset="ios" className="p-8 md:p-10">
+            <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">Explore More Liquid Glass Resources</h2>
+            <p className="text-white/75 mb-6 max-w-3xl">
+              Discover tutorials, docs, examples, and advanced playgrounds to build better Apple-style liquid glass interfaces.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-sm">
+              <Link href="/generator" className="glass-button text-white px-4 py-3 hover:scale-[1.02] transition-transform">Liquid Glass Generator</Link>
+              <Link href="/examples" className="glass-button text-white px-4 py-3 hover:scale-[1.02] transition-transform">Glass Effect Examples</Link>
+              <Link href="/tutorials" className="glass-button text-white px-4 py-3 hover:scale-[1.02] transition-transform">Step-by-step Tutorials</Link>
+              <Link href="/docs" className="glass-button text-white px-4 py-3 hover:scale-[1.02] transition-transform">Developer Documentation</Link>
+            </div>
+          </GlassCard>
         </div>
       </section>
 
@@ -234,7 +283,7 @@ export default function HomePage(): JSX.Element {
       </section>
 
       {/* 用户评价/案例展示区块 */}
-      <section className="py-20 bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900">
+      <section className="page-band py-20">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-white mb-6">Loved by Creators Worldwide</h2>
@@ -308,7 +357,7 @@ export default function HomePage(): JSX.Element {
       </section>
 
       {/* FAQ区块 */}
-      <section className="py-20 bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900">
+      <section className="page-band py-20">
         <div className="max-w-4xl mx-auto px-6">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-white mb-6">Frequently Asked Questions</h2>
@@ -342,7 +391,9 @@ export default function HomePage(): JSX.Element {
           <div className="flex items-center space-x-6">
             <a href="mailto:hi@liquidglass.space" className="text-white/80 hover:text-blue-400 text-sm">Contact</a>
             <a href="/about" className="text-white/80 hover:text-blue-400 text-sm">About</a>
+            <a href="/blog" className="text-white/80 hover:text-blue-400 text-sm">Blog</a>
             <a href="/privacy" className="text-white/80 hover:text-blue-400 text-sm">Privacy Policy</a>
+            <a href="/terms" className="text-white/80 hover:text-blue-400 text-sm">Terms of Service</a>
             <a href="https://twitter.com/liquidglassui" target="_blank" rel="noopener" className="text-white/80 hover:text-blue-400 text-sm">Twitter</a>
           </div>
         </div>

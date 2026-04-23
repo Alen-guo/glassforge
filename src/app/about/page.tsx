@@ -3,52 +3,17 @@
 import React from 'react';
 import { Star, Users, Zap, Globe, Heart, ArrowRight, Sparkles, Code, CheckCircle, Award, Target, Shield, Lightbulb, Rocket } from 'lucide-react';
 import Link from 'next/link';
+import Navbar from '@/components/layout/Navbar';
 
 export default function AboutPage(): JSX.Element {
   return (
     <>
+      <Navbar />
       {/* Hero Section */}
-      <section className="min-h-screen relative overflow-hidden pt-20">
-        <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{
-            backgroundImage: `url('/images/banner2.jpg')`,
-            backgroundAttachment: 'fixed'
-          }}
-        >
-          <div className="absolute inset-0 bg-black/40"></div>
-          <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10"></div>
-        </div>
-
-        {/* 导航栏 */}
-        <nav className="glass-navbar fixed top-0 left-0 right-0 z-50 px-6 py-4">
-          <div className="max-w-7xl mx-auto flex items-center justify-between">
-            <Link href="/" className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
-                <Sparkles className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-white font-bold text-xl">GlassForge</h1>
-                <p className="text-white/60 text-xs">Liquid Glass Generator</p>
-              </div>
-            </Link>
-            
-            <div className="hidden md:flex items-center space-x-6">
-              <Link href="/tutorials" className="text-white/80 hover:text-white transition-colors">Tutorials</Link>
-              <Link href="/examples" className="text-white/80 hover:text-white transition-colors">Examples</Link>
-              <Link href="/docs" className="text-white/80 hover:text-white transition-colors">Docs</Link>
-              <Link href="/about" className="text-white border-b-2 border-blue-400">About</Link>
-            </div>
-            
-            <Link href="/" className="glass-button text-white px-6 py-2 text-sm flex items-center space-x-2">
-              <Code className="w-4 h-4" />
-              <span>Back to Generator</span>
-            </Link>
-          </div>
-        </nav>
+      <section className="page-shell overflow-hidden pt-20">
 
         {/* Hero Content */}
-        <div className="relative z-10 pt-32 pb-16 px-6">
+        <div className="page-content pt-32 pb-16 px-6">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 leading-tight">
               <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">

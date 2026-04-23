@@ -117,14 +117,8 @@ export default function ExamplesPage() {
     <>
       <Navbar />
       
-      <div 
-        className="min-h-screen pt-20 bg-cover bg-center bg-no-repeat relative"
-        style={{
-          backgroundImage: `url('/images/banner2.jpg')`,
-        }}
-      >
-        <div className="absolute inset-0 bg-black/40"></div>
-        <div className="max-w-7xl mx-auto px-6 py-12">
+      <div className="page-shell pt-20">
+        <div className="page-content max-w-7xl mx-auto px-6 py-12">
           
           {/* Page Header */}
           <div className="text-center mb-16">
@@ -173,14 +167,7 @@ export default function ExamplesPage() {
                 </div>
 
                 {/* Live Preview */}
-                <div 
-                  className="rounded-xl p-8 flex items-center justify-center min-h-[200px] bg-cover bg-center"
-                  style={{
-                    backgroundImage: 'url(/images/Examples.jpg)',
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center'
-                  }}
-                >
+                <div className="feature-preview-surface rounded-xl p-8 flex items-center justify-center min-h-[200px]">
                   <div 
                     style={example.style}
                     className="w-full max-w-xs p-6 flex flex-col justify-center items-center text-center hover:scale-105 transition-transform cursor-pointer"

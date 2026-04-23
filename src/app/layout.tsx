@@ -96,7 +96,7 @@ export default function RootLayout({
       </head>
       <body className="h-full antialiased apple-font">
         {/* 全屏容器 */}
-        <div className="min-h-screen bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500">
+        <div className="site-frame">
           {children}
         </div>
         

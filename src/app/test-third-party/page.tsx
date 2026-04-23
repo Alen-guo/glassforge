@@ -83,6 +83,10 @@ export default function TestThirdPartyPage(): JSX.Element {
     cornerRadius: 16,
     mode: 'standard'
   });
+  const sidePanelStyle: React.CSSProperties = {
+    background: 'rgba(0, 0, 0, 0.4)',
+    backdropFilter: 'blur(20px)'
+  };
 
   useEffect(() => {
     setIsClient(true);
@@ -134,16 +138,8 @@ export default function TestThirdPartyPage(): JSX.Element {
     return (
       <>
         <Navbar />
-        <div className="min-h-screen pt-20 flex items-center justify-center">
-          <div 
-            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-            style={{
-              backgroundImage: `url('/images/banner2.jpg')`,
-            }}
-          >
-            <div className="absolute inset-0 bg-black/40"></div>
-          </div>
-          <div className="relative z-10 text-white text-xl flex items-center space-x-3">
+        <div className="page-shell pt-20 flex items-center justify-center">
+          <div className="page-content text-white text-xl flex items-center space-x-3">
             <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
             <span>Initializing Parameter Tester...</span>
           </div>
@@ -157,18 +153,9 @@ export default function TestThirdPartyPage(): JSX.Element {
       <Navbar />
       
       {/* 可滚动的主容器 */}
-      <div className="min-h-screen pt-20 overflow-x-hidden">
-        
-        {/* 背景图片区域 */}
-        <div 
-          className="min-h-screen bg-cover bg-center bg-no-repeat relative"
-          style={{
-            backgroundImage: `url('/images/banner2.jpg')`,
-            backgroundAttachment: 'scroll'
-          }}
-        >
-          {/* 背景遮罩 */}
-          <div className="absolute inset-0 bg-black/20"></div>
+      <div className="page-shell pt-20 overflow-x-hidden">
+        <div className="page-content min-h-screen relative">
+          <div className="mx-auto w-full max-w-[1600px] px-4 lg:px-6 py-6 xl:grid xl:grid-cols-[18rem_minmax(0,1fr)_18rem] xl:gap-6">
           
           {/* 状态提示 */}
           {!hasLiquidGlass && (
@@ -180,13 +167,10 @@ export default function TestThirdPartyPage(): JSX.Element {
           )}
           
           {/* 左侧参数控制面板 */}
-          <div className="fixed left-4 top-20 bottom-4 w-72 z-30 overflow-y-auto">
+          <div className="w-full mb-6 xl:mb-0 xl:sticky xl:top-24 xl:h-[calc(100vh-7rem)] xl:overflow-y-auto xl:self-start">
             <div 
               className="p-6 h-full rounded-xl border border-white/10"
-              style={{
-                background: 'rgba(0, 0, 0, 0.4)',
-                backdropFilter: 'blur(20px)'
-              }}
+              style={sidePanelStyle}
             >
               <h2 className="text-white font-bold text-xl mb-6">🎛️ Parameters</h2>
             
@@ -387,132 +371,38 @@ export default function TestThirdPartyPage(): JSX.Element {
           </div>
         </div>
 
-        {/* 右侧信息面板 */}
-          <div className="fixed right-4 top-20 bottom-4 w-72 z-30 overflow-y-auto">
-            <div 
-              className="p-6 h-full rounded-xl border border-white/10"
-              style={{
-                background: 'rgba(0, 0, 0, 0.4)',
-                backdropFilter: 'blur(20px)'
-              }}
-            >
-              <h2 className="text-white font-bold text-xl mb-6">📊 Live Stats</h2>
-            
-            <div className="space-y-6 text-white/80">
-              <div>
-                  <h3 className="text-white font-medium mb-3">🎯 Current Values</h3>
-                  <div className="text-sm space-y-2">
-                    <div className="flex justify-between">
-                      <span className="text-white/70">Mode:</span>
-                      <span className="text-white font-medium">{params.mode}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-white/70">Displacement:</span>
-                      <span className="text-white">{params.displacementScale}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-white/70">Blur:</span>
-                      <span className="text-white">{params.blurAmount.toFixed(3)}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-white/70">Saturation:</span>
-                      <span className="text-white">{params.saturation}%</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-white/70">Aberration:</span>
-                      <span className="text-white">{params.aberrationIntensity.toFixed(1)}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-white/70">Elasticity:</span>
-                      <span className="text-white">{params.elasticity.toFixed(2)}</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className="text-white font-medium mb-3">🎨 Mode Info</h3>
-                  <p className="text-sm text-white/70">
-                    {params.mode === 'standard' && 'Basic liquid glass distortion with balanced performance and smooth animations.'}
-                    {params.mode === 'polar' && 'Polar coordinate-based distortion creating unique circular patterns and flows.'}
-                    {params.mode === 'prominent' && 'Enhanced visibility with high contrast rendering for maximum impact.'}
-                    {params.mode === 'shader' && 'Advanced WebGL shaders with complex mathematical transformations.'}
-                </p>
-              </div>
-
-              <div>
-                  <h3 className="text-white font-medium mb-3">🚀 Performance</h3>
-                <div className="text-sm space-y-2">
-                    <div className="flex justify-between">
-                      <span className="text-white/70">Library:</span>
-                      <span className={hasLiquidGlass ? "text-green-400" : "text-yellow-400"}>
-                        {hasLiquidGlass ? '✅ liquid-glass-react' : '⚠️ Fallback Mode'}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-white/70">WebGL:</span>
-                      <span className="text-green-400">
-                        {typeof window !== 'undefined' && window.WebGLRenderingContext ? 'Supported' : 'Not Available'}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-white/70">Rendering:</span>
-                      <span className="text-green-400">Hardware Accelerated</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-white/70">Frame Rate:</span>
-                      <span className="text-green-400">60 FPS</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className="text-white font-medium mb-3">💡 Pro Tips</h3>
-                  <ul className="text-sm space-y-2 list-disc list-inside text-white/70">
-                    <li>Higher displacement = more dramatic distortion</li>
-                    <li>Lower blur values = sharper background details</li>
-                    <li>Saturation affects color vibrancy intensity</li>
-                    <li>Try different modes for unique visual styles</li>
-                    <li>Lower elasticity = smoother, fluid animations</li>
-                    <li>Experiment with corner radius for shape variety</li>
-                  </ul>
-                </div>
-
-              </div>
-            </div>
-          </div>
-          
           {/* 中央内容区域 */}
-          <div className="relative flex flex-col items-center justify-center min-h-screen px-6 py-20" style={{marginLeft: '300px', marginRight: '300px'}}>
-            
+          <div className="relative flex flex-col items-center justify-center min-h-screen px-2 sm:px-4 py-12 xl:py-20 order-last xl:order-none">
+
             {/* 导航提示 */}
             <div className="w-full flex justify-center mb-8">
-              <div className="flex items-center gap-4 px-6 py-3 bg-white/10 rounded-full border border-white/20 backdrop-blur-sm">
+              <div className="flex items-center gap-3 sm:gap-4 px-4 sm:px-6 py-3 bg-white/10 rounded-full border border-white/20 backdrop-blur-sm">
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 bg-blue-400 rounded-full animate-pulse"></div>
-                  <span className="text-white/80 text-sm">Controls</span>
+                  <span className="text-white/80 text-xs sm:text-sm">Controls</span>
                 </div>
                 <div className="w-px h-4 bg-white/30"></div>
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-                  <span className="text-white/80 text-sm">Live Preview</span>
+                  <span className="text-white/80 text-xs sm:text-sm">Live Preview</span>
                 </div>
                 <div className="w-px h-4 bg-white/30"></div>
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 bg-purple-400 rounded-full animate-pulse"></div>
-                  <span className="text-white/80 text-sm">Statistics</span>
+                  <span className="text-white/80 text-xs sm:text-sm">Statistics</span>
                 </div>
               </div>
             </div>
 
             {/* 页面标题 */}
-            <div className="text-center mb-16">
-              <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 drop-shadow-lg">
+            <div className="text-center mb-12 sm:mb-16">
+              <h1 className="text-3xl md:text-5xl font-bold text-white mb-4 drop-shadow-lg">
                 🧪 Liquid Glass Parameter Tester
               </h1>
-              <p className="text-xl text-white/90 drop-shadow mb-4">
+              <p className="text-lg md:text-xl text-white/90 drop-shadow mb-4">
                 Adjust parameters in real-time
               </p>
-              <div className="flex justify-center gap-6 text-sm text-white/70">
+              <div className="flex flex-wrap justify-center gap-4 md:gap-6 text-sm text-white/70">
                 <span>🎛️ 6+ Parameters</span>
                 <span>⚡ Real-time Updates</span>
                 <span>🎨 4 Render Modes</span>
@@ -521,7 +411,7 @@ export default function TestThirdPartyPage(): JSX.Element {
             </div>
 
             {/* 主要的 Liquid Glass 展示区域 */}
-            <div className="w-full flex justify-center mb-30">
+            <div className="w-full flex justify-center mb-16">
               {isLoaded ? (
                 <ErrorBoundary fallback={
                   <FallbackGlassEffect>
@@ -561,7 +451,7 @@ export default function TestThirdPartyPage(): JSX.Element {
                   </LiquidGlass>
                 </ErrorBoundary>
               ) : (
-                <div className="text-white animate-pulse p-8 border border-white/20 rounded bg-white/5 backdrop-blur-sm min-w-[400px] min-h-[200px] flex items-center justify-center">
+                <div className="text-white animate-pulse p-8 border border-white/20 rounded bg-white/5 backdrop-blur-sm w-full max-w-xl min-h-[200px] flex items-center justify-center">
                   <div className="text-center">
                     <div className="flex items-center justify-center space-x-2 mb-4">
                       <div className="w-4 h-4 bg-white/30 rounded-full animate-bounce"></div>
@@ -575,9 +465,7 @@ export default function TestThirdPartyPage(): JSX.Element {
             </div>
 
             {/* 继续可滚动的展示区域 */}
-            <div className="w-full mx-auto relative"
-              style={{marginLeft: '30px', marginRight: '20px'}}
-            >
+            <div className="w-full mx-auto relative">
 
               {/* 效果对比展示 */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
@@ -776,10 +664,10 @@ export default function TestThirdPartyPage(): JSX.Element {
                   <div>
                     <span className="text-white font-medium">🎛️ Left Panel:</span> Adjust all effect parameters in real-time
                   </div>
-              <div>
+                  <div>
                     <span className="text-white font-medium">📊 Right Panel:</span> Monitor values and performance metrics
-              </div>
-              <div>
+                  </div>
+                  <div>
                     <span className="text-white font-medium">🎨 Center:</span> Live preview with multiple comparison modes
                   </div>
                   <div className="mt-4 pt-4 border-t border-white/10">
@@ -811,11 +699,102 @@ export default function TestThirdPartyPage(): JSX.Element {
               <span className="px-4 py-2 bg-pink-500/20 text-pink-300 rounded-full text-sm border border-pink-400/30">
                 Interactive UI
               </span>
-        </div>
+            </div>
 
           </div>
-        </div>
 
+          {/* 右侧信息面板 */}
+          <div className="w-full mt-6 xl:mt-0 xl:sticky xl:top-24 xl:h-[calc(100vh-7rem)] xl:overflow-y-auto xl:self-start">
+            <div 
+              className="p-6 h-full rounded-xl border border-white/10"
+              style={sidePanelStyle}
+            >
+              <h2 className="text-white font-bold text-xl mb-6">📊 Live Stats</h2>
+            
+            <div className="space-y-6 text-white/80">
+              <div>
+                  <h3 className="text-white font-medium mb-3">🎯 Current Values</h3>
+                  <div className="text-sm space-y-2">
+                    <div className="flex justify-between">
+                      <span className="text-white/70">Mode:</span>
+                      <span className="text-white font-medium">{params.mode}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-white/70">Displacement:</span>
+                      <span className="text-white">{params.displacementScale}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-white/70">Blur:</span>
+                      <span className="text-white">{params.blurAmount.toFixed(3)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-white/70">Saturation:</span>
+                      <span className="text-white">{params.saturation}%</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-white/70">Aberration:</span>
+                      <span className="text-white">{params.aberrationIntensity.toFixed(1)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-white/70">Elasticity:</span>
+                      <span className="text-white">{params.elasticity.toFixed(2)}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="text-white font-medium mb-3">🎨 Mode Info</h3>
+                  <p className="text-sm text-white/70">
+                    {params.mode === 'standard' && 'Basic liquid glass distortion with balanced performance and smooth animations.'}
+                    {params.mode === 'polar' && 'Polar coordinate-based distortion creating unique circular patterns and flows.'}
+                    {params.mode === 'prominent' && 'Enhanced visibility with high contrast rendering for maximum impact.'}
+                    {params.mode === 'shader' && 'Advanced WebGL shaders with complex mathematical transformations.'}
+                </p>
+              </div>
+
+              <div>
+                  <h3 className="text-white font-medium mb-3">🚀 Performance</h3>
+                <div className="text-sm space-y-2">
+                    <div className="flex justify-between">
+                      <span className="text-white/70">Library:</span>
+                      <span className={hasLiquidGlass ? "text-green-400" : "text-yellow-400"}>
+                        {hasLiquidGlass ? '✅ liquid-glass-react' : '⚠️ Fallback Mode'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-white/70">WebGL:</span>
+                      <span className="text-green-400">
+                        {typeof window !== 'undefined' && window.WebGLRenderingContext ? 'Supported' : 'Not Available'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-white/70">Rendering:</span>
+                      <span className="text-green-400">Hardware Accelerated</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-white/70">Frame Rate:</span>
+                      <span className="text-green-400">60 FPS</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="text-white font-medium mb-3">💡 Pro Tips</h3>
+                  <ul className="text-sm space-y-2 list-disc list-inside text-white/70">
+                    <li>Higher displacement = more dramatic distortion</li>
+                    <li>Lower blur values = sharper background details</li>
+                    <li>Saturation affects color vibrancy intensity</li>
+                    <li>Try different modes for unique visual styles</li>
+                    <li>Lower elasticity = smoother, fluid animations</li>
+                    <li>Experiment with corner radius for shape variety</li>
+                  </ul>
+                </div>
+
+              </div>
+            </div>
+          </div>
+          </div>
+        </div>
       </div>
 
       {/* 自定义样式 */}

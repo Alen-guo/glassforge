@@ -11,14 +11,8 @@ export default function DocsPage(): JSX.Element {
     <>
       <Navbar />
       
-      <div 
-        className="min-h-screen pt-20 bg-cover bg-center bg-no-repeat relative"
-        style={{
-          backgroundImage: `url('/images/banner2.jpg')`,
-        }}
-      >
-        <div className="absolute inset-0 bg-black/40"></div>
-        <div className="max-w-4xl mx-auto px-6 py-12 relative z-10">
+      <div className="page-shell pt-20">
+        <div className="page-content max-w-4xl mx-auto px-6 py-12">
           
           {/* 页面标题 */}
           <div className="text-center mb-12">
@@ -43,7 +37,7 @@ export default function DocsPage(): JSX.Element {
                     Try Generator
                   </Link>
                   <Link href="/test-third-party" className="glass-button bg-gradient-to-r from-purple-500 to-pink-600 text-white px-6 py-3 text-sm font-medium rounded-lg transition-all duration-300 hover:scale-105">
-                    Parameter Tester
+                    Advanced Playground
                   </Link>
                 </div>
               </div>
@@ -147,7 +141,7 @@ export default function DocsPage(): JSX.Element {
                 <Link href="/test-third-party" className="block w-full glass-button-secondary text-white px-4 py-3 text-center rounded-lg transition-all duration-300 hover:scale-105">
                   <div className="flex items-center justify-center space-x-2">
                     <Code className="w-4 h-4" />
-                    <span>Parameter Tester</span>
+                    <span>Advanced Playground</span>
                   </div>
                 </Link>
               </div>
