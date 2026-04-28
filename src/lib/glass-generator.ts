@@ -11,9 +11,9 @@ import type {
  * 默认的玻璃效果参数
  */
 export const DEFAULT_GLASS_PARAMS: GlassEffectParams = {
-  // 基础玻璃效果
+  // 基础玻璃效果 — V1 扭曲玻璃默认值
   transparency: 10,
-  blur: 20,
+  blur: 0,
   borderOpacity: 20,
   reflection: 50,
   depth: 5,
@@ -21,15 +21,15 @@ export const DEFAULT_GLASS_PARAMS: GlassEffectParams = {
   // 背景颜色控制
   backgroundColorType: 'white',
   backgroundColor: '#ffffff',
-  backgroundOpacity: 10,
+  backgroundOpacity: 0,
   gradientColors: ['#ffffff', '#f0f0f0'],
   gradientDirection: 'to-br',
 
   // 尺寸和形状
   width: 300,
-  height: 180,
+  height: 280,
   padding: 24,
-  borderRadius: 16,
+  borderRadius: 28,
   borderWidth: 1,
 
   // 组件类型和样式
@@ -42,6 +42,10 @@ export const DEFAULT_GLASS_PARAMS: GlassEffectParams = {
   animationDuration: 300,
   enableAnimation: true,
   hoverEffect: 'lift',
+
+  // SVG 扭曲玻璃效果 — V1 默认值
+  turbulenceFrequency: 0.012,
+  displacementScale: 85,
 };
 
 /**
@@ -80,6 +84,9 @@ export const GLASS_PRESETS: Record<GlassPresetType, GlassPreset> = {
       animationDuration: 300,
       enableAnimation: true,
       hoverEffect: 'lift',
+      // SVG 扭曲
+      turbulenceFrequency: 0.012,
+      displacementScale: 85,
     },
   },
   'vision-pro': {
@@ -111,6 +118,8 @@ export const GLASS_PRESETS: Record<GlassPresetType, GlassPreset> = {
       animationDuration: 500,
       enableAnimation: true,
       hoverEffect: 'glow',
+      turbulenceFrequency: 0.012,
+      displacementScale: 85,
     },
   },
   macos: {
@@ -142,6 +151,8 @@ export const GLASS_PRESETS: Record<GlassPresetType, GlassPreset> = {
       animationDuration: 250,
       enableAnimation: true,
       hoverEffect: 'scale',
+      turbulenceFrequency: 0.012,
+      displacementScale: 85,
     },
   },
   material: {
@@ -173,6 +184,8 @@ export const GLASS_PRESETS: Record<GlassPresetType, GlassPreset> = {
       animationDuration: 200,
       enableAnimation: true,
       hoverEffect: 'lift',
+      turbulenceFrequency: 0.012,
+      displacementScale: 85,
     },
   },
   custom: {
@@ -203,7 +216,9 @@ export function generateLiquidGlassCSS(params: GlassEffectParams): GeneratedCSS 
     innerGlow,
     animationDuration,
     enableAnimation,
-    hoverEffect
+    hoverEffect,
+    turbulenceFrequency,
+    displacementScale,
   } = params;
 
   // 计算具体的CSS值
@@ -257,43 +272,76 @@ export function generateLiquidGlassCSS(params: GlassEffectParams): GeneratedCSS 
     '--glass-border-radius': `${borderRadius}px`,
     '--glass-border-width': `${borderWidth}px`,
     '--glass-animation-duration': `${animationDuration}ms`,
+    '--glass-turbulence-freq': turbulenceFrequency.toString(),
+    '--glass-displacement-scale': displacementScale.toString(),
   };
 
-  // 生成CSS代码
+  // 生成CSS代码（含SVG扭曲滤镜）
   const cssCode = `
+<!-- SVG Distortion Filter — paste before your HTML element -->
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <filter id="liquid-glass-distortion" x="0%" y="0%" width="100%" height="100%">
+      <feTurbulence type="fractalNoise"
+        baseFrequency="${turbulenceFrequency} ${turbulenceFrequency}"
+        numOctaves="2" seed="92" result="noise" />
+      <feGaussianBlur in="noise" stdDeviation="2" result="blurred" />
+      <feDisplacementMap in="SourceGraphic" in2="blurred"
+        scale="${displacementScale}"
+        xChannelSelector="R" yChannelSelector="G" />
+    </filter>
+  </defs>
+</svg>
+
+/* Distortion Glass CSS */
 .liquid-glass {
   /* 尺寸和布局 */
   width: ${width}px;
   height: ${height}px;
   padding: ${padding}px;
-  
-  /* 背景和透明度 */
-  background: rgba(255, 255, 255, ${backgroundAlpha});
-  
-  /* 模糊效果 */
+
+  /* 形状与隔离 */
+  border-radius: ${borderRadius}px;
+  isolation: isolate;
+  position: relative;
+
+  /* 外发光阴影 */
+  box-shadow: ${getShadow()}${innerGlow ? `, inset 0 1px 0 rgba(255, 255, 255, ${reflection / 100})` : ''};
+
+  cursor: ${hoverEffect !== 'none' ? 'pointer' : 'default'};
+  ${enableAnimation ? `transition: all ${animationDuration}ms cubic-bezier(0.4, 0.0, 0.2, 1);` : ''}
+}
+
+/* 边框高光层 */
+.liquid-glass::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: ${borderRadius}px;
+  border: ${borderWidth}px solid rgba(255, 255, 255, ${borderAlpha});
+  background-color: rgba(255, 255, 255, ${backgroundAlpha});
+  ${reflectionGradient !== 'none' ? `background-image: ${reflectionGradient};` : ''}
+  pointer-events: none;
+}
+
+/* 扭曲backdrop层（核心玻璃效果）*/
+.liquid-glass::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: ${borderRadius}px;
   backdrop-filter: blur(${blurValue});
   -webkit-backdrop-filter: blur(${blurValue});
-  
-  /* 边框 */
-  border: ${borderWidth}px solid rgba(255, 255, 255, ${borderAlpha});
-  border-radius: ${borderRadius}px;
-  
-  /* 阴影和深度 */
-  box-shadow: ${getShadow()}${innerGlow ? `, inset 0 1px 0 rgba(255, 255, 255, ${reflection / 100})` : ''};
-  
-  /* 反射效果 */
-  ${reflectionGradient !== 'none' ? `background-image: ${reflectionGradient};` : ''}
-  
-  /* 动画 */
-  ${enableAnimation ? `transition: all ${animationDuration}ms cubic-bezier(0.4, 0.0, 0.2, 1);` : ''}
-  
-  /* 悬停指针 */
-  cursor: ${hoverEffect !== 'none' ? 'pointer' : 'default'};
+  filter: url(#liquid-glass-distortion);
+  -webkit-filter: url(#liquid-glass-distortion);
+  isolation: isolate;
+  pointer-events: none;
 }
 
 .liquid-glass:hover {
   ${enableAnimation && hoverEffect !== 'none' ? `
-  background: rgba(255, 255, 255, ${Math.min(backgroundAlpha + 0.02, 0.2)});
   transform: ${getHoverTransform()};
   filter: ${getHoverFilter()};
   ` : ''}
@@ -301,17 +349,15 @@ export function generateLiquidGlassCSS(params: GlassEffectParams): GeneratedCSS 
 
 /* 响应式设计 */
 @media (max-width: 768px) {
-  .liquid-glass {
-    backdrop-filter: blur(${Math.max(blur * 0.7, 5)}px);
-    -webkit-backdrop-filter: blur(${Math.max(blur * 0.7, 5)}px);
+  .liquid-glass::after {
+    backdrop-filter: blur(${Math.max(blur * 0.7, 0)}px);
+    -webkit-backdrop-filter: blur(${Math.max(blur * 0.7, 0)}px);
   }
 }
 
 /* 无障碍支持 */
 @media (prefers-reduced-motion: reduce) {
-  .liquid-glass {
-    transition: none;
-  }
+  .liquid-glass { transition: none; }
 }`.trim();
 
   return {
@@ -879,7 +925,7 @@ export function validateGlassParams(params: Partial<GlassEffectParams>): GlassEf
   const validated: GlassEffectParams = {
     // 基础玻璃效果 - 优化范围以获得更好的视觉效果
     transparency: Math.max(1, Math.min(50, params.transparency ?? DEFAULT_GLASS_PARAMS.transparency)),
-    blur: Math.max(2, Math.min(25, params.blur ?? DEFAULT_GLASS_PARAMS.blur)),
+    blur: Math.max(0, Math.min(25, params.blur ?? DEFAULT_GLASS_PARAMS.blur)),
     borderOpacity: Math.max(5, Math.min(60, params.borderOpacity ?? DEFAULT_GLASS_PARAMS.borderOpacity)),
     reflection: Math.max(0, Math.min(80, params.reflection ?? DEFAULT_GLASS_PARAMS.reflection)),
     depth: Math.max(1, Math.min(8, params.depth ?? DEFAULT_GLASS_PARAMS.depth)),
@@ -908,6 +954,10 @@ export function validateGlassParams(params: Partial<GlassEffectParams>): GlassEf
     animationDuration: Math.max(0, Math.min(2000, params.animationDuration ?? DEFAULT_GLASS_PARAMS.animationDuration)),
     enableAnimation: params.enableAnimation ?? DEFAULT_GLASS_PARAMS.enableAnimation,
     hoverEffect: params.hoverEffect ?? DEFAULT_GLASS_PARAMS.hoverEffect,
+
+    // SVG 扭曲玻璃效果
+    turbulenceFrequency: Math.max(0.001, Math.min(0.05, params.turbulenceFrequency ?? DEFAULT_GLASS_PARAMS.turbulenceFrequency)),
+    displacementScale: Math.max(10, Math.min(200, params.displacementScale ?? DEFAULT_GLASS_PARAMS.displacementScale)),
   };
 
   return validated;

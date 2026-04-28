@@ -14,7 +14,7 @@ import Ripple from './Ripple';
 export default function GeneratorClient() {
   const [copySuccess, setCopySuccess] = useState(false);
   const [exportFormat, setExportFormat] = useState<ExportFormat>('css');
-  const [backgroundImage, setBackgroundImage] = useState<string>('banner1.jpg');
+  const [backgroundImage, setBackgroundImage] = useState<string>('banner3.jpg');
   const [actionMessage, setActionMessage] = useState<string | null>(null);
   const importInputRef = useRef<HTMLInputElement | null>(null);
   const messageTimeoutRef = useRef<number | null>(null);
@@ -24,6 +24,8 @@ export default function GeneratorClient() {
   // 使用玻璃效果状态管理
   const currentPreset = useCurrentPreset();
   const glassParams = useGlassParams();
+  const turbulenceFrequency = glassParams.turbulenceFrequency ?? 0.012;
+  const displacementScale = glassParams.displacementScale ?? 85;
   const {
     applyPreset,
     updateParam,
@@ -249,6 +251,29 @@ export default function GeneratorClient() {
   return (
     <>
       <Navbar />
+
+      {/* SVG 扭曲滤镜定义 — 隐藏，供预览卡片使用 */}
+      <svg width="0" height="0" style={{ position: 'absolute' }}>
+        <defs>
+          <filter id="generator-glass-distortion" x="0%" y="0%" width="100%" height="100%">
+            <feTurbulence
+              type="fractalNoise"
+              baseFrequency={`${turbulenceFrequency} ${turbulenceFrequency}`}
+              numOctaves={2}
+              seed={92}
+              result="noise"
+            />
+            <feGaussianBlur in="noise" stdDeviation="2" result="blurred" />
+            <feDisplacementMap
+              in="SourceGraphic"
+              in2="blurred"
+              scale={displacementScale}
+              xChannelSelector="R"
+              yChannelSelector="G"
+            />
+          </filter>
+        </defs>
+      </svg>
       
       <div className="page-shell pt-20">
         <div className="page-content max-w-7xl mx-auto px-6 py-12">
@@ -327,9 +352,9 @@ export default function GeneratorClient() {
                 </h3>
                 <div className="grid grid-cols-3 gap-3 mb-6">
                   {[
-                    { file: 'banner1.jpg', name: 'Cosmic Purple', },
+                    { file: 'banner3.jpg', name: 'Ocean Waves', },
                     { file: 'banner2.jpg', name: 'Aurora Gradient',},
-                    { file: 'banner3.jpg', name: 'Ocean Waves', }
+                    { file: 'banner1.jpg', name: 'Cosmic Purple', }
                   ].map((bg) => (
                     <button
                       key={bg.file}
@@ -434,14 +459,14 @@ export default function GeneratorClient() {
                     </div>
                     <input
                       type="range"
-                      min="2"
+                      min="0"
                       max="25"
                       value={glassParams.blur}
                       onChange={(e) => updateParam('blur', parseInt(e.target.value))}
                       className="glass-slider w-full"
                     />
                     <div className="flex justify-between items-center mt-1 text-xs">
-                      <span className="text-white/60">💡 Sweet spot: 8-15px</span>
+                      <span className="text-white/60">💡 0px = pure distortion, sweet spot: 8-15px</span>
                       <span className={`px-2 py-1 rounded text-xs ${
                         glassParams.blur >= 8 && glassParams.blur <= 15 
                           ? 'bg-green-500/20 text-green-300' 
@@ -734,6 +759,68 @@ export default function GeneratorClient() {
                     </label>
                   </div>
 
+                  {/* SVG 扭曲玻璃参数 */}
+                  <div className="border-t border-white/20 pt-6">
+                    <h4 className="text-white font-semibold text-sm mb-1">🌊 Distortion Effect</h4>
+                    <p className="text-white/50 text-xs mb-4">SVG displacement filter — controls the lens-warp look</p>
+
+                    {/* 湍流频率 */}
+                    <div className="mb-5">
+                      <div className="flex justify-between items-center mb-2">
+                        <label className="text-white text-sm font-medium">Turbulence Freq</label>
+                        <span className="text-blue-300 text-sm font-mono">{turbulenceFrequency.toFixed(3)}</span>
+                      </div>
+                      <input
+                        type="range"
+                        min="1"
+                        max="50"
+                        value={Math.round(turbulenceFrequency * 1000)}
+                        onChange={(e) => updateParam('turbulenceFrequency', parseInt(e.target.value) / 1000)}
+                        className="glass-slider w-full"
+                      />
+                      <div className="flex justify-between items-center mt-1 text-xs">
+                        <span className="text-white/60">💡 Lower = coarser distortion</span>
+                        <span className={`px-2 py-1 rounded text-xs ${
+                          turbulenceFrequency <= 0.015
+                            ? 'bg-green-500/20 text-green-300'
+                            : turbulenceFrequency <= 0.03
+                            ? 'bg-yellow-500/20 text-yellow-300'
+                            : 'bg-red-500/20 text-red-300'
+                        }`}>
+                          {turbulenceFrequency <= 0.015 ? 'Soft' : turbulenceFrequency <= 0.03 ? 'Medium' : 'Fine'}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* 位移缩放 */}
+                    <div>
+                      <div className="flex justify-between items-center mb-2">
+                        <label className="text-white text-sm font-medium">Displacement Scale</label>
+                        <span className="text-blue-300 text-sm font-mono">{displacementScale}</span>
+                      </div>
+                      <input
+                        type="range"
+                        min="10"
+                        max="200"
+                        value={displacementScale}
+                        onChange={(e) => updateParam('displacementScale', parseInt(e.target.value))}
+                        className="glass-slider w-full"
+                      />
+                      <div className="flex justify-between items-center mt-1 text-xs">
+                        <span className="text-white/60">💡 Higher = stronger warp</span>
+                        <span className={`px-2 py-1 rounded text-xs ${
+                          displacementScale <= 100
+                            ? 'bg-green-500/20 text-green-300'
+                            : displacementScale <= 150
+                            ? 'bg-yellow-500/20 text-yellow-300'
+                            : 'bg-red-500/20 text-red-300'
+                        }`}>
+                          {displacementScale <= 100 ? 'Subtle' : displacementScale <= 150 ? 'Strong' : 'Extreme'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
                   {/* 动画和交互控制 */}
                   <div className="border-t border-white/20 pt-6">
                     <h4 className="text-white font-semibold text-sm mb-4">🎬 Animation & Interaction</h4>
@@ -813,9 +900,9 @@ export default function GeneratorClient() {
                     onChange={(e) => setBackgroundImage(e.target.value)}
                     className="w-full glass-select text-sm"
                   >
-                    <option value="banner1.jpg">Cosmic Purple - Deep space vibes</option>
-                    <option value="banner2.jpg">Aurora Gradient - Northern lights</option>
                     <option value="banner3.jpg">Ocean Waves - Fluid patterns</option>
+                    <option value="banner2.jpg">Aurora Gradient - Northern lights</option>
+                    <option value="banner1.jpg">Cosmic Purple - Deep space vibes</option>
                   </select>
                 </div>
                 
@@ -981,29 +1068,67 @@ export default function GeneratorClient() {
                           </div>
                         );
                       
-                      default: // card
+      default: // card
                         return (
                           <div 
-                            style={style}
-                            className="text-center space-y-4 relative overflow-hidden cursor-pointer"
+                            style={{
+                              position: 'relative',
+                              width: `${glassParams.width}px`,
+                              height: `${glassParams.height}px`,
+                              borderRadius: `${glassParams.borderRadius}px`,
+                              isolation: 'isolate',
+                              boxShadow: `0px 0px 21px -8px rgba(255, 255, 255, 0.3)`,
+                              cursor: 'pointer',
+                            }}
                             onMouseEnter={handleMouseEnter}
                             onMouseLeave={handleMouseLeave}
                           >
-                            <div className="w-16 h-16 bg-gradient-to-br from-blue-400 via-purple-500 to-pink-500 rounded-2xl mx-auto flex items-center justify-center shadow-lg">
-                              <Sparkles className="w-8 h-8 text-white" />
-                            </div>
-                            <div className="preview-content">
-                              <h4 className="text-white text-lg font-bold mb-2">Liquid Glass Card</h4>
-                              <p className="text-white/70 text-sm leading-relaxed">
-                                {glassParams.transparency}% transparency, {glassParams.blur}px blur
-                              </p>
-                            </div>
-                            <div className="flex space-x-3">
-                              <div className="flex-1 bg-white/10 rounded-lg py-2 text-white text-sm text-center">
-                                Action
+                            {/* 边框/背景高光层 (::before) */}
+                            <div style={{
+                              position: 'absolute',
+                              inset: 0,
+                              zIndex: 0,
+                              borderRadius: `${glassParams.borderRadius}px`,
+                              border: `${glassParams.borderWidth}px solid rgba(255,255,255,${glassParams.borderOpacity / 100})`,
+                              backgroundColor: `rgba(255,255,255,${glassParams.backgroundOpacity / 100})`,
+                              pointerEvents: 'none',
+                            }} />
+                            {/* 扭曲backdrop层 (::after) */}
+                            <div style={{
+                              position: 'absolute',
+                              inset: 0,
+                              zIndex: -1,
+                              borderRadius: `${glassParams.borderRadius}px`,
+                              backdropFilter: `blur(${glassParams.blur}px)`,
+                              WebkitBackdropFilter: `blur(${glassParams.blur}px)`,
+                              filter: 'url(#generator-glass-distortion)',
+                              isolation: 'isolate',
+                              pointerEvents: 'none',
+                            }} />
+                            {/* 内容层 */}
+                            <div style={{
+                              position: 'relative',
+                              zIndex: 1,
+                              padding: `${glassParams.padding}px`,
+                              height: '100%',
+                              display: 'flex',
+                              flexDirection: 'column',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              gap: '16px',
+                            }}>
+                              <div className="w-16 h-16 bg-gradient-to-br from-blue-400 via-purple-500 to-pink-500 rounded-2xl mx-auto flex items-center justify-center shadow-lg">
+                                <Sparkles className="w-8 h-8 text-white" />
                               </div>
-                              <div className="flex-1 bg-blue-500/20 rounded-lg py-2 text-white text-sm text-center">
-                                Primary
+                              <div className="preview-content text-center">
+                                <h4 className="text-white text-lg font-bold mb-2">Liquid Glass Card</h4>
+                                <p className="text-white/70 text-sm leading-relaxed">
+                                  freq {turbulenceFrequency.toFixed(3)} · scale {displacementScale} · blur {glassParams.blur}px
+                                </p>
+                              </div>
+                              <div className="flex space-x-3 w-full">
+                                <div className="flex-1 bg-white/10 rounded-lg py-2 text-white text-sm text-center">Action</div>
+                                <div className="flex-1 bg-blue-500/20 rounded-lg py-2 text-white text-sm text-center">Primary</div>
                               </div>
                             </div>
                           </div>

@@ -8,6 +8,326 @@ import Navbar from '@/components/layout/Navbar';
 export default function ExamplesPage() {
   const [copiedExample, setCopiedExample] = useState<string | null>(null);
 
+  const distortionPreviewStyle: React.CSSProperties = {
+    backgroundImage: [
+      "linear-gradient(135deg, rgba(8,12,24,0.25), rgba(8,12,24,0.55))",
+      "radial-gradient(circle at 22% 25%, rgba(56, 189, 248, 0.42), transparent 34%)",
+      "radial-gradient(circle at 78% 22%, rgba(244, 114, 182, 0.36), transparent 36%)",
+      "radial-gradient(circle at 52% 78%, rgba(96, 165, 250, 0.26), transparent 38%)",
+      "url('/images/banner3.jpg')",
+    ].join(', '),
+    backgroundSize: 'cover, auto, auto, auto, cover',
+    backgroundPosition: 'center, center, center, center, center',
+    border: '1px solid rgba(255, 255, 255, 0.12)',
+    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.15), 0 12px 35px rgba(8, 14, 30, 0.28)',
+  };
+
+  const customDistortionCssV1 = `.liquid-glass-card {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  min-height: 300px;
+  border-radius: 28px;
+  isolation: isolate;
+  box-shadow: 0px 0px 21px -8px rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+}
+
+.liquid-glass-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: 28px;
+  box-shadow: inset 0 0 5px -8px rgba(255, 255, 255, 0.7);
+  background-color: rgba(255, 255, 255, 0);
+  pointer-events: none;
+}
+
+.liquid-glass-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: 28px;
+  backdrop-filter: blur(0px);
+  -webkit-backdrop-filter: blur(0px);
+  filter: url(#glass-distortion-v1);
+  -webkit-filter: url(#glass-distortion-v1);
+  isolation: isolate;
+  pointer-events: none;
+}`;
+
+  const distortionSnippetV1 = `<!-- Distortion Glass V1: copy into a standalone HTML file -->
+<div class="glass-demo-stage">
+  <svg width="0" height="0" style="position:absolute">
+    <defs>
+      <filter id="glass-distortion-v1" x="0%" y="0%" width="100%" height="100%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.012 0.012" numOctaves="2" seed="92" result="noise" />
+        <feGaussianBlur in="noise" stdDeviation="2" result="blurred" />
+        <feDisplacementMap in="SourceGraphic" in2="blurred" scale="85" xChannelSelector="R" yChannelSelector="G" />
+      </filter>
+    </defs>
+  </svg>
+
+  <div class="liquid-glass-card">
+    <div class="card-content">
+      <div class="card-header">
+        <div class="user-info">
+          <div class="avatar">
+            <svg class="avatar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+          </div>
+          <div class="user-details">
+            <p class="user-name">Jane Doe</p>
+            <p class="user-role">UX Designer</p>
+          </div>
+        </div>
+        <svg class="notification-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+        </svg>
+      </div>
+      <div class="card-body">
+        <h3 class="card-title">Styled Component</h3>
+        <p class="card-description">This is a sample of how your content might look inside.</p>
+        <button class="glass-button">Get Started</button>
+      </div>
+      <p class="card-tip">Tip: Try adjusting the sliders and colors to see real-time changes!</p>
+    </div>
+  </div>
+</div>
+
+<style>
+  .glass-demo-stage {
+    min-height: 420px;
+    display: grid;
+    place-items: center;
+    padding: 40px 20px;
+    background:
+      linear-gradient(135deg, rgba(8,12,24,0.25), rgba(8,12,24,0.55)),
+      radial-gradient(circle at 22% 25%, rgba(56, 189, 248, 0.42), transparent 34%),
+      radial-gradient(circle at 78% 22%, rgba(244, 114, 182, 0.36), transparent 36%),
+      radial-gradient(circle at 52% 78%, rgba(96, 165, 250, 0.26), transparent 38%),
+      url('/images/banner3.jpg') center/cover no-repeat;
+  }
+
+  .liquid-glass-card {
+    position: relative;
+    width: min(100%, 400px);
+    min-height: 300px;
+    border-radius: 28px;
+    isolation: isolate;
+    box-shadow: 0px 0px 21px -8px rgba(255, 255, 255, 0.3);
+  }
+
+  .liquid-glass-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    border-radius: 28px;
+    box-shadow: inset 0 0 5px -8px rgba(255, 255, 255, 0.7);
+    background-color: rgba(255, 255, 255, 0);
+    pointer-events: none;
+  }
+
+  .liquid-glass-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: 28px;
+    backdrop-filter: blur(0px);
+    -webkit-backdrop-filter: blur(0px);
+    filter: url(#glass-distortion-v1);
+    -webkit-filter: url(#glass-distortion-v1);
+    pointer-events: none;
+  }
+
+  .card-content {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 24px;
+    color: white;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  }
+
+  .card-header { display: flex; justify-content: space-between; align-items: flex-start; }
+  .user-info { display: flex; align-items: center; gap: 12px; }
+  .avatar { width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.1); border: 2px solid #3b82f6; display: flex; align-items: center; justify-content: center; }
+  .avatar-icon { width: 20px; height: 20px; color: #3b82f6; }
+  .user-details { display: flex; flex-direction: column; }
+  .user-name { font-weight: 600; margin: 0; }
+  .user-role { font-size: 12px; opacity: 0.7; margin: 0; }
+  .notification-icon { width: 20px; height: 20px; opacity: 0.5; }
+  .card-body { text-align: center; margin-top: 8px; }
+  .card-title { font-size: 18px; font-weight: 700; margin: 0 0 4px 0; }
+  .card-description { font-size: 14px; opacity: 0.7; margin: 0 0 16px 0; }
+  .glass-button { width: 100%; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 8px 16px; border-radius: 8px; font-weight: 600; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+  .card-tip { font-size: 12px; text-align: center; color: #e0e6ed; margin: 16px 0 0 0; }
+</style>`;
+
+  const customDistortionCssV2 = `.liquid-glass-card {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  min-height: 300px;
+  border-radius: 28px;
+  isolation: isolate;
+  box-shadow: 0px 0px 21px -8px rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+}
+
+.liquid-glass-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: 28px;
+  box-shadow: inset 0 0 4px -8px rgba(255, 255, 255, 0.7);
+  background-color: rgba(255, 255, 255, 0);
+  pointer-events: none;
+}
+
+.liquid-glass-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: 28px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  filter: url(#glass-distortion-v2);
+  -webkit-filter: url(#glass-distortion-v2);
+  isolation: isolate;
+  pointer-events: none;
+}`;
+
+  const distortionSnippetV2 = `<!-- Distortion Glass V2: copy into a standalone HTML file -->
+<div class="glass-demo-stage">
+  <svg width="0" height="0" style="position:absolute">
+    <defs>
+      <filter id="glass-distortion-v2" x="0%" y="0%" width="100%" height="100%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.018 0.018" numOctaves="2" seed="92" result="noise" />
+        <feGaussianBlur in="noise" stdDeviation="2" result="blurred" />
+        <feDisplacementMap in="SourceGraphic" in2="blurred" scale="120" xChannelSelector="R" yChannelSelector="G" />
+      </filter>
+    </defs>
+  </svg>
+
+  <div class="liquid-glass-card">
+    <div class="card-content">
+      <div class="card-header">
+        <div class="user-info">
+          <div class="avatar">
+            <svg class="avatar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+          </div>
+          <div class="user-details">
+            <p class="user-name">Jane Doe</p>
+            <p class="user-role">UX Designer</p>
+          </div>
+        </div>
+        <svg class="notification-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+        </svg>
+      </div>
+      <div class="card-body">
+        <h3 class="card-title">Styled Component</h3>
+        <p class="card-description">This is a sample of how your content might look inside.</p>
+        <button class="glass-button">Get Started</button>
+      </div>
+      <p class="card-tip">Tip: Try adjusting the sliders and colors to see real-time changes!</p>
+    </div>
+  </div>
+</div>
+
+<style>
+  .glass-demo-stage {
+    min-height: 420px;
+    display: grid;
+    place-items: center;
+    padding: 40px 20px;
+    background:
+      linear-gradient(135deg, rgba(8,12,24,0.25), rgba(8,12,24,0.55)),
+      radial-gradient(circle at 22% 25%, rgba(56, 189, 248, 0.42), transparent 34%),
+      radial-gradient(circle at 78% 22%, rgba(244, 114, 182, 0.36), transparent 36%),
+      radial-gradient(circle at 52% 78%, rgba(96, 165, 250, 0.26), transparent 38%),
+      url('/images/banner3.jpg') center/cover no-repeat;
+  }
+
+  .liquid-glass-card {
+    position: relative;
+    width: min(100%, 400px);
+    min-height: 300px;
+    border-radius: 28px;
+    isolation: isolate;
+    box-shadow: 0px 0px 21px -8px rgba(255, 255, 255, 0.3);
+  }
+
+  .liquid-glass-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    border-radius: 28px;
+    box-shadow: inset 0 0 4px -8px rgba(255, 255, 255, 0.7);
+    background-color: rgba(255, 255, 255, 0);
+    pointer-events: none;
+  }
+
+  .liquid-glass-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: 28px;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    filter: url(#glass-distortion-v2);
+    -webkit-filter: url(#glass-distortion-v2);
+    pointer-events: none;
+  }
+
+  .card-content {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 24px;
+    color: white;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  }
+
+  .card-header { display: flex; justify-content: space-between; align-items: flex-start; }
+  .user-info { display: flex; align-items: center; gap: 12px; }
+  .avatar { width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.1); border: 2px solid #3b82f6; display: flex; align-items: center; justify-content: center; }
+  .avatar-icon { width: 20px; height: 20px; color: #3b82f6; }
+  .user-details { display: flex; flex-direction: column; }
+  .user-name { font-weight: 600; margin: 0; }
+  .user-role { font-size: 12px; opacity: 0.7; margin: 0; }
+  .notification-icon { width: 20px; height: 20px; opacity: 0.5; }
+  .card-body { text-align: center; margin-top: 8px; }
+  .card-title { font-size: 18px; font-weight: 700; margin: 0 0 4px 0; }
+  .card-description { font-size: 14px; opacity: 0.7; margin: 0 0 16px 0; }
+  .glass-button { width: 100%; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 8px 16px; border-radius: 8px; font-weight: 600; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+  .card-tip { font-size: 12px; text-align: center; color: #e0e6ed; margin: 16px 0 0 0; }
+</style>`;
+
   const copyToClipboard = async (text: string, exampleId: string) => {
     try {
       await navigator.clipboard.writeText(text);
@@ -20,9 +340,9 @@ export default function ExamplesPage() {
 
   const examples = [
     {
-      id: 'ios-card',
-      name: 'iOS Glass Card',
-      description: 'Classic iOS frosted glass effect',
+      id: 'ios-card-v1',
+      name: 'Distortion Glass V1',
+      description: 'Original: low blur + softer displacement',
       category: 'Mobile',
       difficulty: 'Beginner',
       popularity: 98,
@@ -33,14 +353,23 @@ export default function ExamplesPage() {
         borderRadius: '20px',
         boxShadow: '0 12px 48px rgba(31, 38, 135, 0.37)'
       },
-      css: `.ios-glass-card {
-  background: rgba(255, 255, 255, 0.01);
-  backdrop-filter: blur(1px);
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  border-radius: 20px;
-  padding: 20px;
-  box-shadow: 0 12px 48px rgba(31, 38, 135, 0.37);
-}`
+      css: distortionSnippetV1
+    },
+    {
+      id: 'ios-card-v2',
+      name: 'Distortion Glass V2',
+      description: 'New: stronger displacement + 12px blur',
+      category: 'Mobile',
+      difficulty: 'Intermediate',
+      popularity: 94,
+      style: {
+        background: 'rgba(255, 255, 255, 0.01)',
+        backdropFilter: 'blur(1px)',
+        border: '2px solid rgba(255, 255, 255, 0.2)',
+        borderRadius: '20px',
+        boxShadow: '0 12px 48px rgba(31, 38, 135, 0.37)'
+      },
+      css: distortionSnippetV2
     },
     {
       id: 'vision-pro',
@@ -119,6 +448,45 @@ export default function ExamplesPage() {
       
       <div className="page-shell pt-20">
         <div className="page-content max-w-7xl mx-auto px-6 py-12">
+          <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true" focusable="false">
+            <defs>
+              <filter id="glass-distortion-v1" x="0%" y="0%" width="100%" height="100%">
+                <feTurbulence
+                  type="fractalNoise"
+                  baseFrequency="0.012 0.012"
+                  numOctaves="2"
+                  seed="92"
+                  result="noise"
+                />
+                <feGaussianBlur in="noise" stdDeviation="2" result="blurred" />
+                <feDisplacementMap
+                  in="SourceGraphic"
+                  in2="blurred"
+                  scale="85"
+                  xChannelSelector="R"
+                  yChannelSelector="G"
+                />
+              </filter>
+
+              <filter id="glass-distortion-v2" x="0%" y="0%" width="100%" height="100%">
+                <feTurbulence
+                  type="fractalNoise"
+                  baseFrequency="0.018 0.018"
+                  numOctaves="2"
+                  seed="92"
+                  result="noise"
+                />
+                <feGaussianBlur in="noise" stdDeviation="2" result="blurred" />
+                <feDisplacementMap
+                  in="SourceGraphic"
+                  in2="blurred"
+                  scale="120"
+                  xChannelSelector="R"
+                  yChannelSelector="G"
+                />
+              </filter>
+            </defs>
+          </svg>
           
           {/* Page Header */}
           <div className="text-center mb-16">
@@ -167,15 +535,49 @@ export default function ExamplesPage() {
                 </div>
 
                 {/* Live Preview */}
-                <div className="feature-preview-surface rounded-xl p-8 flex items-center justify-center min-h-[200px]">
-                  <div 
-                    style={example.style}
-                    className="w-full max-w-xs p-6 flex flex-col justify-center items-center text-center hover:scale-105 transition-transform cursor-pointer"
-                  >
-                    <Sparkles className="w-8 h-8 text-white mb-3" />
-                    <h4 className="text-white font-medium text-sm mb-2">{example.name}</h4>
-                    <p className="text-white/70 text-xs">Hover to interact</p>
-                  </div>
+                <div
+                  className="feature-preview-surface rounded-xl p-8 flex items-center justify-center min-h-[200px]"
+                  style={example.id.startsWith('ios-card-') ? distortionPreviewStyle : undefined}
+                >
+                  {example.id.startsWith('ios-card-') ? (
+                    <div className={`liquid-glass-card ${example.id === 'ios-card-v2' ? 'liquid-glass-card--v2' : 'liquid-glass-card--v1'}`}>
+                      <div className="card-content">
+                        <div className="card-header">
+                          <div className="user-info">
+                            <div className="avatar">
+                              <svg className="avatar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                                <circle cx="12" cy="7" r="4" />
+                              </svg>
+                            </div>
+                            <div className="user-details">
+                              <p className="user-name">Jane Doe</p>
+                              <p className="user-role">UX Designer</p>
+                            </div>
+                          </div>
+                          <svg className="notification-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                          </svg>
+                        </div>
+                        <div className="card-body">
+                          <h3 className="card-title">Styled Component</h3>
+                          <p className="card-description">This is a sample of how your content might look inside.</p>
+                          <button className="distortion-button">Get Started</button>
+                        </div>
+                        <p className="card-tip">Tip: Try adjusting the sliders and colors to see real-time changes!</p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div
+                      style={example.style}
+                      className="w-full max-w-xs p-6 flex flex-col justify-center items-center text-center hover:scale-105 transition-transform cursor-pointer"
+                    >
+                      <Sparkles className="w-8 h-8 text-white mb-3" />
+                      <h4 className="text-white font-medium text-sm mb-2">{example.name}</h4>
+                      <p className="text-white/70 text-xs">Hover to interact</p>
+                    </div>
+                  )}
                 </div>
 
                 {/* Code Preview */}
@@ -189,8 +591,8 @@ export default function ExamplesPage() {
                       {copiedExample === example.id ? <CheckCircle className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
                     </button>
                   </div>
-                  <div className="p-4 text-xs font-mono text-green-400 overflow-x-auto">
-                    <pre>{example.css}</pre>
+                  <div className="p-4 text-xs font-mono text-green-400 overflow-auto max-h-64">
+                    <pre className="whitespace-pre">{example.css}</pre>
                   </div>
                 </div>
 
@@ -238,6 +640,180 @@ export default function ExamplesPage() {
 
         </div>
       </div>
+
+      <style jsx>{`
+        .liquid-glass-card {
+          position: relative;
+          width: min(100%, 400px);
+          min-height: 300px;
+          border-radius: 28px;
+          isolation: isolate;
+          box-shadow: 0px 0px 21px -8px rgba(255, 255, 255, 0.3);
+          cursor: pointer;
+        }
+
+        .liquid-glass-card--v1::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          z-index: 0;
+          border-radius: 28px;
+          box-shadow: inset 0 0 5px -8px rgba(255, 255, 255, 0.7);
+          background-color: rgba(255, 255, 255, 0);
+          pointer-events: none;
+        }
+
+        .liquid-glass-card--v1::after {
+          content: '';
+          position: absolute;
+          inset: 0;
+          z-index: -1;
+          border-radius: 28px;
+          backdrop-filter: blur(0px);
+          -webkit-backdrop-filter: blur(0px);
+          filter: url(#glass-distortion-v1);
+          -webkit-filter: url(#glass-distortion-v1);
+          isolation: isolate;
+          pointer-events: none;
+        }
+
+        .liquid-glass-card--v2::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          z-index: 0;
+          border-radius: 28px;
+          box-shadow: inset 0 0 4px -8px rgba(255, 255, 255, 0.7);
+          background-color: rgba(255, 255, 255, 0);
+          pointer-events: none;
+        }
+
+        .liquid-glass-card--v2::after {
+          content: '';
+          position: absolute;
+          inset: 0;
+          z-index: -1;
+          border-radius: 28px;
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+          filter: url(#glass-distortion-v2);
+          -webkit-filter: url(#glass-distortion-v2);
+          isolation: isolate;
+          pointer-events: none;
+        }
+
+        .card-content {
+          position: relative;
+          z-index: 10;
+          width: 100%;
+          height: 100%;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          padding: 24px;
+          color: white;
+          text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+        }
+
+        .user-info {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
+
+        .avatar {
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          background: rgba(255, 255, 255, 0.1);
+          border: 2px solid #3b82f6;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .avatar-icon {
+          width: 20px;
+          height: 20px;
+          color: #3b82f6;
+        }
+
+        .user-details {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .user-name {
+          font-weight: 600;
+          margin: 0;
+        }
+
+        .user-role {
+          font-size: 12px;
+          opacity: 0.7;
+          margin: 0;
+        }
+
+        .notification-icon {
+          width: 20px;
+          height: 20px;
+          opacity: 0.5;
+        }
+
+        .card-body {
+          text-align: center;
+          margin-top: 8px;
+        }
+
+        .card-title {
+          font-size: 18px;
+          font-weight: 700;
+          margin: 0 0 4px 0;
+        }
+
+        .card-description {
+          font-size: 14px;
+          opacity: 0.7;
+          margin: 0 0 16px 0;
+        }
+
+        .distortion-button {
+          width: 100%;
+          background: rgba(255, 255, 255, 0.1);
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          color: white;
+          padding: 8px 16px;
+          border-radius: 8px;
+          font-weight: 600;
+          cursor: pointer;
+          backdrop-filter: blur(8px);
+          -webkit-backdrop-filter: blur(8px);
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+          transition: all 0.2s ease;
+        }
+
+        .distortion-button:hover {
+          background: rgba(255, 255, 255, 0.2);
+        }
+
+        .distortion-button:focus {
+          outline: none;
+          box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.4);
+        }
+
+        .card-tip {
+          font-size: 12px;
+          text-align: center;
+          color: #e0e6ed;
+          margin: 16px 0 0 0;
+        }
+      `}</style>
     </>
   );
 } 

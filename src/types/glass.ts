@@ -57,6 +57,12 @@ export interface GlassEffectParams {
     enableAnimation: boolean;
     /** 悬停效果 */
     hoverEffect: 'none' | 'lift' | 'glow' | 'scale';
+
+    // SVG 扭曲玻璃效果
+    /** 湍流频率 (0.005-0.05)，控制扭曲纹理细腻程度 */
+    turbulenceFrequency: number;
+    /** 位移缩放 (10-200)，控制扭曲强度 */
+    displacementScale: number;
 }
 
 /**

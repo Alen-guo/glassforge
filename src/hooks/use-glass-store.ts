@@ -205,6 +205,25 @@ export const useGlassStore = create<GlassStore>()(
         }),
         {
             name: 'glassforge-store', // localStorage中的键名
+            merge: (persistedState, currentState) => {
+                const typedState = persistedState as Partial<GlassStore> | undefined;
+                const nextPreset = typedState?.currentPreset;
+
+                return {
+                    ...currentState,
+                    ...typedState,
+                    currentParams: validateGlassParams(typedState?.currentParams ?? currentState.currentParams),
+                    currentPreset: nextPreset && nextPreset in GLASS_PRESETS ? nextPreset : currentState.currentPreset,
+                    preferences: {
+                        ...currentState.preferences,
+                        ...typedState?.preferences,
+                    },
+                    scene3D: {
+                        ...currentState.scene3D,
+                        ...typedState?.scene3D,
+                    },
+                };
+            },
             partialize: (state) => ({
                 // 只持久化这些字段
                 currentParams: state.currentParams,
